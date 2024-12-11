@@ -1,0 +1,8 @@
+.vscode
+.idea
+80m.img
+80m.img.lock
+a.img
+kernel.dbg
+*.bin
+*.o
