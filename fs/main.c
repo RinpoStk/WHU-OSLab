@@ -27,6 +27,7 @@ PRIVATE void mkfs();
 PRIVATE void read_super_block(int dev);
 PRIVATE int fs_fork();
 PRIVATE int fs_exit();
+PRIVATE int do_search_file();
 
 /*****************************************************************************
  *                                task_fs
@@ -62,6 +63,9 @@ PUBLIC void task_fs()
 		case UNLINK:
 			fs_msg.RETVAL = do_unlink();
 			break;
+		// case SEARCH:
+        //     fs_msg.RETVAL = do_search_file();
+        //     break;
 		case RESUME_PROC:
 			src = fs_msg.PROC_NR;
 			break;
@@ -598,4 +602,54 @@ PRIVATE int fs_exit()
 	}
 	return 0;
 }
+// PRIVATE int do_search_file()
+// {
+//     char pathname[MAX_PATH];
+//     char filenames[128][MAX_FILENAME_LEN];
+//     int file_count = 0;
 
+//     /* get parameters from the message */
+//     int name_len = fs_msg.NAME_LEN;
+//     int src = fs_msg.source;
+//     assert(name_len < MAX_PATH);
+//     phys_copy((void*)va2la(TASK_FS, pathname),
+//               (void*)va2la(src, fs_msg.PATHNAME),
+//               name_len);
+//     pathname[name_len] = 0;
+
+//     char filename[MAX_PATH];
+//     struct inode *dir_inode;
+
+//     if (strip_path(filename, pathname, &dir_inode) != 0)
+//         return 0;
+
+//     int dir_blk0_nr = dir_inode->i_start_sect;
+//     int nr_dir_blks = (dir_inode->i_size + SECTOR_SIZE - 1) / SECTOR_SIZE;
+//     int nr_dir_entries = dir_inode->i_size / DIR_ENTRY_SIZE;
+
+//     struct dir_entry *pde;
+
+//     for (int i = 0; i < nr_dir_blks; i++) {
+//         RD_SECT(dir_inode->i_dev, dir_blk0_nr + i);
+//         pde = (struct dir_entry *)fsbuf;
+//         for (int j = 0; j < SECTOR_SIZE / DIR_ENTRY_SIZE; j++, pde++) {
+//             if (pde->inode_nr != INVALID_INODE) {
+//                 strncpy(filenames[file_count], pde->name, MAX_FILENAME_LEN);
+//                 filenames[file_count][MAX_FILENAME_LEN - 1] = 0; // Ensure null-termination
+//                 file_count++;
+//                 if (file_count >= 128)
+//                     break; // Reached maximum number of files
+//             }
+//             if (file_count > nr_dir_entries)
+//                 break;
+//         }
+//         if (file_count > nr_dir_entries)
+//             break;
+//     }
+
+//     /* send the result back to the caller */
+//     fs_msg.CNT = file_count;
+//     phys_copy((void*)va2la(src, fs_msg.BUF), (void*)filenames, file_count * MAX_FILENAME_LEN);
+
+//     return 0;
+// }

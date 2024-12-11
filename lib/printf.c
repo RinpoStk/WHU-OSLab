@@ -95,7 +95,7 @@ PUBLIC int printf(const char *fmt, ...)
 PUBLIC int printl(const char *fmt, ...)
 {
 	int i;
-	char buf[STR_DEFAULT_LEN/2];
+	char buf[STR_DEFAULT_LEN];
 
 	va_list arg = (va_list)((char*)(&fmt) + 4); /**
 						     * 4: size of `fmt' in

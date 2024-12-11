@@ -210,6 +210,72 @@ PUBLIC void do_exit(int status)
 	}
 }
 
+PUBLIC int do_kill(int pid, int status){
+    // 检查目标 PID 是否在有效范围内
+    if(pid < 0 || pid >= NR_TASKS + NR_PROCS){
+        printl("do_kill: Invalid PID %d\n", pid);
+        return -1;
+    }
+
+    struct proc *p = &proc_table[pid];
+    
+    if(p->p_flags == FREE_SLOT){
+        printl("do_kill: PID %d is already free\n", pid);
+        return -1;
+    }
+
+    int parent_pid = p->p_parent;
+	// tell FS, see fs_exit()
+    MESSAGE msg2fs;
+    msg2fs.type = EXIT;
+    msg2fs.PID = pid;
+    msg2fs.STATUS = status;
+    
+    if(send_recv(BOTH, TASK_FS, &msg2fs) != 0){
+        printl("do_kill: Failed to send EXIT message to FS for PID %d\n", pid);
+        return -1;
+    }
+
+    free_mem(pid);
+
+    p->exit_status = status;
+
+    int has_children = 0;
+    for(int i = 0; i < NR_TASKS + NR_PROCS; i++){
+        if(proc_table[i].p_parent == pid){
+            has_children = 1;
+            break;
+        }
+    }
+
+    if(parent_pid != NO_TASK && (proc_table[parent_pid].p_flags & WAITING)){
+        proc_table[parent_pid].p_flags &= ~WAITING;
+        cleanup(&proc_table[pid]);
+    }
+    else if(has_children){
+        //if parent is not waiting, set HANGING bit
+        proc_table[pid].p_flags |= HANGING;
+    }
+    else{
+        //if parent is not waiting and has no children, set FREE_SLOT
+        p->p_flags = FREE_SLOT;
+    }
+
+    if(has_children){
+        for(int i = 0; i < NR_TASKS + NR_PROCS; i++){
+            if(proc_table[i].p_parent == pid){
+                proc_table[i].p_parent = INIT;
+                if((proc_table[INIT].p_flags & WAITING) && (proc_table[i].p_flags & HANGING)){
+                    proc_table[INIT].p_flags &= ~WAITING;
+                    cleanup(&proc_table[i]);
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 /*****************************************************************************
  *                                cleanup
  *****************************************************************************/

@@ -25,6 +25,9 @@ PUBLIC void do_fork_test();
 
 PRIVATE void init_mm();
 
+PRIVATE int do_get_proc_info(int src);
+
+
 /*****************************************************************************
  *                                task_mm
  *****************************************************************************/
@@ -57,6 +60,12 @@ PUBLIC void task_mm()
 		case WAIT:
 			do_wait();
 			reply = 0;
+			break;
+		case GET_PROC_INFO:
+			mm_msg.RETVAL = do_get_proc_info(src);
+            break;
+		case KILL:
+		    mm_msg.RETVAL = do_kill(mm_msg.PID, mm_msg.STATUS);
 			break;
 		default:
 			dump_msg("MM::unknown msg", &mm_msg);
@@ -134,5 +143,11 @@ PUBLIC int alloc_mem(int pid, int memsize)
  *****************************************************************************/
 PUBLIC int free_mem(int pid)
 {
+	return 0;
+}
+
+PRIVATE int do_get_proc_info(int src){
+	struct proc *p_proc = proc_table;
+	phys_copy(va2la(src,(void*)mm_msg.BUF), va2la(TASK_MM,(void*)p_proc), sizeof(struct proc) * (NR_TASKS+NR_PROCS));
 	return 0;
 }

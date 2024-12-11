@@ -67,5 +67,10 @@ struct boot_params {
 	unsigned char *	kernel_file;	/* addr of kernel file */
 };
 
+typedef struct procinfo{
+    int pid;
+    char name[16];
+} ProcInfo;
+
 
 #endif /* _ORANGES_TYPE_H_ */

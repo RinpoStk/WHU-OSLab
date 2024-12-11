@@ -170,10 +170,10 @@ enum msgtype {
 	GET_TICKS, GET_PID, GET_RTC_TIME,
 
 	/* FS */
-	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK,
+	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, SEARCH,
 
 	/* FS & TTY */
-	SUSPEND_PROC, RESUME_PROC,
+	SUSPEND_PROC, RESUME_PROC, GET_PROC_INFO,
 
 	/* MM */
 	EXEC, WAIT,
@@ -183,6 +183,8 @@ enum msgtype {
 
 	/* TTY, SYS, FS, MM, etc */
 	SYSCALL_RET,
+
+	KILL,
 
 	/* message type for drivers */
 	DEV_OPEN = 1001,
@@ -198,12 +200,12 @@ enum msgtype {
 #define	FLAGS		u.m3.m3i1
 #define	NAME_LEN	u.m3.m3i2
 #define	BUF_LEN		u.m3.m3i3
-#define	CNT		u.m3.m3i2
+#define	CNT			u.m3.m3i2
 #define	REQUEST		u.m3.m3i2
 #define	PROC_NR		u.m3.m3i3
 #define	DEVICE		u.m3.m3i4
 #define	POSITION	u.m3.m3l1
-#define	BUF		u.m3.m3p2
+#define	BUF			u.m3.m3p2
 #define	OFFSET		u.m3.m3i2
 #define	WHENCE		u.m3.m3i3
 
@@ -262,7 +264,6 @@ enum msgtype {
 /* device numbers of hard disk */
 #define	MINOR_hd1a		0x10
 #define	MINOR_hd2a		(MINOR_hd1a+NR_SUB_PER_PART)
-#define	MINOR_hd2c		(MINOR_hd1a+NR_SUB_PER_PART+2)
 
 #define	ROOT_DEV		MAKE_DEV(DEV_HD, MINOR_BOOT)
 
@@ -290,7 +291,7 @@ enum msgtype {
 #define	is_special(m)	((((m) & I_TYPE_MASK) == I_BLOCK_SPECIAL) ||	\
 			 (((m) & I_TYPE_MASK) == I_CHAR_SPECIAL))
 
-#define	NR_DEFAULT_FILE_SECTS	2048 /* 2048 * 512 = 1MB */
+#define	NR_DEFAULT_FILE_SECTS	512 /* 2048 * 512 = 1MB */
 
 
 

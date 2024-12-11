@@ -37,7 +37,7 @@ PUBLIC void get_boot_params(struct boot_params * pbp)
 {
 	/**
 	 * Boot params should have been saved at BOOT_PARAM_ADDR.
-	 * @see include/load.inc boot/loader.asm boot/hdldr.asm
+	 * @see include/load.inc boot/loader.asm boot/hdloader.asm
 	 */
 	int * p = (int*)BOOT_PARAM_ADDR;
 	assert(p[BI_MAG] == BOOT_PARAM_MAGIC);

@@ -24,13 +24,13 @@ EXTERN	u32	k_reenter;
 EXTERN	int	current_console;
 
 EXTERN	int	key_pressed; /**
-                  * used for clock_handler
-                  * to wake up TASK_TTY when
-                  * a key is pressed
-                  */
+			      * used for clock_handler
+			      * to wake up TASK_TTY when
+			      * a key is pressed
+			      */
 
 EXTERN	struct tss	tss;
-EXTERN	struct proc* p_proc_ready;
+EXTERN	struct proc*	p_proc_ready;
 
 extern	char		task_stack[];
 extern	struct proc	proc_table[];
@@ -40,14 +40,9 @@ extern	irq_handler	irq_table[];
 extern	TTY		tty_table[];
 extern  CONSOLE		console_table[];
 
-/*process schedule*/
-extern  PROC_QUEUE     MLFQ[NR_QUEUES];
-extern  int         cur_time_slice[NR_TASKS + NR_PROCS];
-extern  int idx;
-
 /* MM */
 EXTERN	MESSAGE			mm_msg;
-extern	u8* mmbuf;
+extern	u8 *			mmbuf;
 extern	const int		MMBUF_SIZE;
 EXTERN	int			memory_size;
 
@@ -55,22 +50,15 @@ EXTERN	int			memory_size;
 EXTERN	struct file_desc	f_desc_table[NR_FILE_DESC];
 EXTERN	struct inode		inode_table[NR_INODE];
 EXTERN	struct super_block	super_block[NR_SUPER_BLOCK];
-extern	u8* fsbuf;
+extern	u8 *			fsbuf;
 extern	const int		FSBUF_SIZE;
 EXTERN	MESSAGE			fs_msg;
-EXTERN	struct proc* pcaller;
-EXTERN	struct inode* root_inode;
+EXTERN	struct proc *		pcaller;
+EXTERN	struct inode *		root_inode;
 extern	struct dev_drv_map	dd_map[];
 
 /* for test only */
-extern	char* logbuf;
+extern	char *			logbuf;
 extern	const int		LOGBUF_SIZE;
-extern	char* logdiskbuf;
+extern	char *			logdiskbuf;
 extern	const int		LOGDISKBUF_SIZE;
-
-/*for memory management*/
-EXTERN  int     PageDirBase;
-EXTERN  int     PageTblBase;
-EXTERN  int     dwPDENum;
-EXTERN  u8      szPageFreeErr[20];
-EXTERN  u8      szPageAllocErr[20];
