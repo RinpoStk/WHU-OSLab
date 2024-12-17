@@ -111,6 +111,7 @@ PUBLIC	int	sprintf(char *buf, const char *fmt, ...);
 
 /* lib/open.c */
 PUBLIC	int	open		(const char *pathname, int flags);
+PUBLIC	int	ftruncate	(int fd, int length);	
 
 /* lib/close.c */
 PUBLIC	int	close		(int fd);
@@ -139,6 +140,7 @@ PUBLIC int  kill		(int pid);
 
 /* lib/wait.c */
 PUBLIC int	wait		(int * status);
+// PUBLIC int  waitpid		(int pid, int *status, struct proc * p_proc);
 
 /* lib/exec.c */
 PUBLIC int	exec		(const char * path);
@@ -152,6 +154,7 @@ PUBLIC int	stat		(const char *path, struct stat *buf);
 PUBLIC	int	syslog		(const char *fmt, ...);
 
 PUBLIC int atoi(const char *str);
-
+PUBLIC char *strtok(char *str, const char *delim);
+PUBLIC char *strchr(const char *str, int c);
 
 #endif /* _ORANGES_STDIO_H_ */

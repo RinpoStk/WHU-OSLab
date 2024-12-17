@@ -112,6 +112,7 @@ PUBLIC int		do_fork();
 PUBLIC void		do_exit(int status);
 PUBLIC void		do_wait();
 PUBLIC int 		do_kill(int pid,int status);
+PUBLIC void 	do_waitpid();
 // PUBLIC void		do_kill(int pid, int status);
 
 /* mm/exec.c */

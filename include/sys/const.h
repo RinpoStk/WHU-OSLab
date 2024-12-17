@@ -184,7 +184,7 @@ enum msgtype {
 	/* TTY, SYS, FS, MM, etc */
 	SYSCALL_RET,
 
-	KILL,
+	KILL,TRUNCATE,WAITPID,
 
 	/* message type for drivers */
 	DEV_OPEN = 1001,
@@ -293,6 +293,8 @@ enum msgtype {
 
 #define	NR_DEFAULT_FILE_SECTS	512 /* 2048 * 512 = 1MB */
 
-
+#define NULL (void *)0
+#define MAX_COMMAND_LENGTH 128
+#define MAX_ARGC 10
 
 #endif /* _ORANGES_CONST_H_ */

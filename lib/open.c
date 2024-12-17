@@ -45,3 +45,15 @@ PUBLIC int open(const char *pathname, int flags)
 
 	return msg.FD;
 }
+
+PUBLIC int ftruncate(int fd, int length)
+{
+    MESSAGE msg;
+    msg.type   = TRUNCATE;
+    msg.FD     = fd;
+    msg.CNT = length;
+
+    send_recv(BOTH, TASK_FS, &msg);
+
+    return msg.RETVAL;
+}

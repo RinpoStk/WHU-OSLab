@@ -67,6 +67,10 @@ PUBLIC void task_mm()
 		case KILL:
 		    mm_msg.RETVAL = do_kill(mm_msg.PID, mm_msg.STATUS);
 			break;
+		case WAITPID:
+			do_waitpid();
+			reply = 0;
+			break;
 		default:
 			dump_msg("MM::unknown msg", &mm_msg);
 			assert(0);
