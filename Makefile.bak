@@ -15,8 +15,8 @@ DASM		= objdump
 CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I boot/include/
-ASMKFLAGS	= -I include/ -I include/sys/ -f elf
-CFLAGS		= -m32 -I include/ -I include/sys/ -c -fno-builtin -Wall -fno-stack-protector
+ASMKFLAGS	= -g -I include/ -I include/sys/ -f elf
+CFLAGS		= -m32 -g -I include/ -I include/sys/ -c -fno-builtin -Wall -fno-stack-protector
 #CFLAGS		= -I include/ -c -fno-builtin -fno-stack-protector -fpack-struct -Wall
 LDFLAGS		= -m elf_i386 -Ttext $(ENTRYPOINT) -Map krnl.map
 DASMFLAGS	= -D
@@ -25,6 +25,7 @@ ARFLAGS		= rcs
 # This Program
 ORANGESBOOT	= boot/boot.bin boot/hdboot.bin boot/loader.bin boot/hdloader.bin
 ORANGESKERNEL	= kernel.bin
+SYMKERNEL = kernel.dbg
 LIB		= lib/orangescrt.a
 
 OBJS		= kernel/kernel.o kernel/start.o kernel/main.o\
@@ -47,23 +48,27 @@ LOBJS		=  lib/syscall.o\
 DASMOUTPUT	= kernel.bin.asm
 
 # All Phony Targets
-.PHONY : everything final image clean realclean disasm all buildimg
+.PHONY : split everything final image clean realclean disasm all buildimg
 
 # Default starting position
 nop :
 	@echo "why not \`make image' huh? :)"
 
+split: everything
+	objcopy --only-keep-debug $(ORANGESKERNEL) $(SYMKERNEL)
+	strip --strip-debug $(ORANGESKERNEL)
+
 everything : $(ORANGESBOOT) $(ORANGESKERNEL)
 
-all : realclean everything
+all : realclean split
 
-image : realclean everything clean buildimg
+image : realclean split clean buildimg
 
 clean :
 	rm -f $(OBJS) $(LOBJS)
 
 realclean :
-	rm -f $(OBJS) $(LOBJS) $(LIB) $(ORANGESBOOT) $(ORANGESKERNEL)
+	rm -f $(OBJS) $(LOBJS) $(LIB) $(ORANGESBOOT) $(ORANGESKERNEL) $(SYMKERNEL)
 
 disasm :
 	$(DASM) $(DASMFLAGS) $(ORANGESKERNEL) > $(DASMOUTPUT)

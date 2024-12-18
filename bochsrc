@@ -6,7 +6,7 @@
 megs: 32
 
 # filename of ROM images
-romimage: file=/usr/local/share/bochs/BIOS-bochs-latest
+romimage: file=/home/rinpostk/Documents/code/os/bochs-gdb/share/bochs/BIOS-bochs-latest
 vgaromimage: file=/usr/share/vgabios/vgabios.bin
 
 # what disk images will be used
@@ -32,4 +32,6 @@ mouse: enabled=0
 
 # enable key mapping, using US layout as default.
 # keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/x11-pc-us.map
-display_library:sdl
+
+# enable gdb debug
+gdbstub: enabled = 1, port = 1234, text_base = 0, data_base = 0, bss_base = 0

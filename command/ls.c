@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include"string.h"
 #include "../include/sys/const.h"
 #include "type.h"
 
