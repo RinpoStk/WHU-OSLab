@@ -28,13 +28,13 @@
 PUBLIC int kernel_main()
 {
 	disp_str("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
 	int i, j, eflags, prio;
         u8  rpl;
         u8  priv; /* privilege */
 
 	struct task * t;
 	struct proc * p = proc_table;
+	PROC_QUEUE* p_queue = MLFQ;
 
 	char * stk = task_stack + STACK_SIZE_TOTAL;
 
@@ -44,20 +44,19 @@ PUBLIC int kernel_main()
 			continue;
 		}
 
-	        if (i < NR_TASKS) {     /* TASK */
-                        t	= task_table + i;
-                        priv	= PRIVILEGE_TASK;
-                        rpl     = RPL_TASK;
-                        eflags  = 0x1202;/* IF=1, IOPL=1, bit 2 is always 1 */
-			prio    = 15;
-                }
-                else {                  /* USER PROC */
-                        t	= user_proc_table + (i - NR_TASKS);
-                        priv	= PRIVILEGE_USER;
-                        rpl     = RPL_USER;
-                        eflags  = 0x202;	/* IF=1, bit 2 is always 1 */
-			prio    = 5;
-                }
+        if (i < NR_TASKS) {     /* TASK */
+            t	= task_table + i;
+            priv	= PRIVILEGE_TASK;
+            rpl     = RPL_TASK;
+            eflags  = 0x1202;		/* IF=1, IOPL=1, bit 2 is always 1 */
+			prio    = 15000;
+        } else {                  /* USER PROC */
+            t	= user_proc_table + (i - NR_TASKS);
+            priv	= PRIVILEGE_USER;
+            rpl     = RPL_USER;
+            eflags  = 0x202;	/* IF=1, bit 2 is always 1 */
+			prio    = 13;
+        }
 
 		strcpy(p->name, t->name);	/* name of the process */
 		p->p_parent = NO_TASK;
@@ -69,8 +68,7 @@ PUBLIC int kernel_main()
 			/* change the DPLs */
 			p->ldts[INDEX_LDT_C].attr1  = DA_C   | priv << 5;
 			p->ldts[INDEX_LDT_RW].attr1 = DA_DRW | priv << 5;
-		}
-		else {		/* INIT process */
+		} else {		/* INIT process */
 			unsigned int k_base;
 			unsigned int k_limit;
 			int ret = get_kernel_map(&k_base, &k_limit);
@@ -123,8 +121,24 @@ PUBLIC int kernel_main()
 
 	p_proc_ready	= proc_table;
 
-	init_clock();
-        init_keyboard();
+    //init process queue
+    for (i = 0; i < NR_QUEUES; i++)
+    {
+        p_queue[i].head = 0;
+        p_queue[i].tail = 0;
+        p_queue[i].time_slice = i + 1;
+        p_queue[i].queue_len = NR_TASKS + NR_PROCS + 1;
+    }
+    for (i = 0;i < NR_TASKS + NR_PROCS;i++)
+    {
+        p_queue->queue[p_queue->tail] = &proc_table[i];
+        p_queue->tail = (p_queue->tail + 1) % p_queue->queue_len;
+        cur_time_slice[proc2pid(&proc_table[i])] = p_queue->time_slice;
+    }
+    // proc_table[7].ticks = proc_table[8].ticks = proc_table[9].ticks = 15;
+    // disp_int(p_queue->queue[p_queue->head]);
+    init_clock();
+    init_keyboard();
 
 	restart();
 
@@ -225,7 +239,9 @@ void untar(const char * filename)
 			bytes = write(fdout, buf, iobytes);
 			assert(bytes == iobytes);
 			bytes_left -= iobytes;
+			printf(".");
 		}
+		printf("\n");
 		close(fdout);
 	}
 
@@ -371,7 +387,28 @@ void TestA()
 	// char *files;
 	// files = search_dir("/");
 	// printf("%s",files);
-	while (1);
+	while (1) {
+		// milli_delay(10000);
+		//
+		// if (mm_buffull_flag) {
+		// 	filelog(MMLOG, mm_log_file);
+		// }
+		//
+		// if (fs_buffull_flag) {
+		// 	// handle fs_log_bufpos overflow
+		// 	filelog(FSLOG, fs_log_file);
+		// }
+		//
+		// if (sys_buffull_flag) {
+		// 	// handle sys_log_bufpos overflow
+		// 	filelog(SYSLOG, sys_log_file);
+		// }
+		//
+		// if (hd_buffull_flag) {
+		// 	// handle hd_log_bufpos overflow
+		// 	filelog(HDLOG, hd_log_file);
+		// }
+	}
 	
 	// for(;;){
     // 	printf("PID\tNAME\n");
@@ -415,4 +452,5 @@ PUBLIC void panic(const char *fmt, ...)
 	/* should never arrive here */
 	__asm__ __volatile__("ud2");
 }
+
 

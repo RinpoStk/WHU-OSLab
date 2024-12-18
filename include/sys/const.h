@@ -186,6 +186,10 @@ enum msgtype {
 
 	KILL,
 
+	// GET_PNAME,
+	//
+	// FS_LOG,					// FS_LOG for fs send msg to mm
+
 	/* message type for drivers */
 	DEV_OPEN = 1001,
 	DEV_CLOSE,
@@ -195,7 +199,7 @@ enum msgtype {
 };
 
 /* macros for messages */
-#define	FD		u.m3.m3i1
+#define	FD			u.m3.m3i1
 #define	PATHNAME	u.m3.m3p1
 #define	FLAGS		u.m3.m3i1
 #define	NAME_LEN	u.m3.m3i2
@@ -209,17 +213,9 @@ enum msgtype {
 #define	OFFSET		u.m3.m3i2
 #define	WHENCE		u.m3.m3i3
 
-#define	PID		u.m3.m3i2
+#define	PID			u.m3.m3i2
 #define	RETVAL		u.m3.m3i1
 #define	STATUS		u.m3.m3i1
-
-
-
-
-
-
-
-
 
 #define	DIOCTL_GET_GEO	1
 
@@ -296,3 +292,17 @@ enum msgtype {
 
 
 #endif /* _ORANGES_CONST_H_ */
+
+/**
+ * @enum logtype
+ */
+enum logtype{
+	MMLOG = 1,
+	FSLOG,
+	SYSLOG,
+	HDLOG
+};
+
+#define MAX_LOG_BUF 256
+#define CHECK_LOG_BUF 220
+

@@ -19,7 +19,7 @@
 #include "console.h"
 #include "global.h"
 #include "proto.h"
-
+#include "krandom.h"
 
 #include "elf.h"
 
@@ -159,4 +159,18 @@ PUBLIC void delay(int time)
 			for(j=0;j<10000;j++){}
 		}
 	}
+}
+
+/*======================================================================*
+							   random
+ *======================================================================*/
+PUBLIC int random(void) {
+	if (rand_times >= 624 || rand_times == 0) {
+		rand_times = 0;
+		k_seed = proc_table[1].ticks;
+	}
+	rand_times += 1;
+	u64 tmp = _RANDOM_A * k_seed + _RANDOM_C;
+	k_seed = tmp % _RANDOM_M;
+	return k_seed;
 }

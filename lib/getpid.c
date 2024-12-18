@@ -38,3 +38,14 @@ PUBLIC int getpid()
 
 	return msg.PID;
 }
+
+// PUBLIC int getpname()
+// {
+// 	MESSAGE msg;
+// 	msg.type	= GET_PNAME;
+//
+// 	send_recv(BOTH, TASK_MM, &msg);
+// 	assert(msg.type == SYSCALL_RET);
+//
+// 	return msg.RETVAL;
+// }

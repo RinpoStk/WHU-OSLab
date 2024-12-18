@@ -34,8 +34,8 @@ PUBLIC void clock_handler(int irq)
 	if (++ticks >= MAX_TICKS)
 		ticks = 0;
 
-	if (p_proc_ready->ticks)
-		p_proc_ready->ticks--;
+	// if (p_proc_ready->ticks)
+	// 	p_proc_ready->ticks--;
 
 	if (key_pressed)
 		inform_int(TASK_TTY);
@@ -44,9 +44,9 @@ PUBLIC void clock_handler(int irq)
 		return;
 	}
 
-	if (p_proc_ready->ticks > 0) {
-		return;
-	}
+	// if (p_proc_ready->ticks > 0) {
+	// 	return;
+	// }
 
 	schedule();
 

@@ -55,6 +55,11 @@ PUBLIC	irq_handler	irq_table[NR_IRQ];
 PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {sys_printx,
 						       sys_sendrec};
 
+/*process schedule*/
+PUBLIC  int         cur_time_slice[NR_TASKS + NR_PROCS] = { 0 };
+PUBLIC  PROC_QUEUE         MLFQ[NR_QUEUES];          //Multilevel Feedback Queue
+PUBLIC  int idx = 0;
+
 /* FS related below */
 /*****************************************************************************/
 /**
@@ -88,6 +93,9 @@ PUBLIC	u8 *		mmbuf		= (u8*)0x700000;
 PUBLIC	const int	MMBUF_SIZE	= 0x100000;
 
 
+PUBLIC int k_seed = 1;
+PUBLIC int rand_times = 0;
+
 /**
  * 8MB~10MB: buffer for log (debug)
  */
@@ -96,3 +104,25 @@ PUBLIC	const int	LOGBUF_SIZE	= 0x100000;
 PUBLIC	char *		logdiskbuf	= (char*)0x900000;
 PUBLIC	const int	LOGDISKBUF_SIZE	= 0x100000;
 
+
+/* for log buf */
+PUBLIC bool mm_buffull_flag = false;
+PUBLIC bool fs_buffull_flag = false;
+PUBLIC bool sys_buffull_flag = false;
+PUBLIC bool hd_buffull_flag = false;
+
+// PUBLIC bool a = true;
+
+PUBLIC int mm_log_bufpos = 0;
+PUBLIC int fs_log_bufpos = 0;
+PUBLIC int sys_log_bufpos = 0;
+PUBLIC int hd_log_bufpos = 0;
+PUBLIC char mm_log_buf	[MAX_LOG_BUF];
+PUBLIC char fs_log_buf	[MAX_LOG_BUF];
+PUBLIC char sys_log_buf	[MAX_LOG_BUF];
+PUBLIC char hd_log_buf	[MAX_LOG_BUF];
+
+PUBLIC char * mm_log_file = "syslog_mm";
+PUBLIC char * fs_log_file = "syslog_fs";
+PUBLIC char * sys_log_file = "syslog_sys";
+PUBLIC char * hd_log_file = "syslog_hd";

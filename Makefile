@@ -42,7 +42,7 @@ DASMOUTPUT	= kernel.bin.asm
 
 # command compile
 CASMFLAGS 	= -I include/ -f elf
-CCFLAGS 	= -m32 -fno-pie -I include/ -c -fno-builtin -fno-stack-protector -Wall
+CCFLAGS 	= -masm=intel -m32 -fno-pie -I include/ -c -fno-builtin -fno-stack-protector -Wall
 CLDFLAGS 	= -Ttext $(ENTRYPOINT) -m elf_i386
 
 # command src
@@ -68,10 +68,10 @@ split : everything
 
 all : realclean split command
 
-image : realclean split command clean buildimg
+image : realclean split command buildimg clean
 
 clean :
-	rm -f $(OBJS) $(CSTARTOBJ) $(COBJS)
+	rm -f $(OBJS) $(CSTARTOBJ) $(COBJS) $(CBIN)
 
 realclean :
 	rm -f $(OBJS) $(ORANGESBOOT) $(ORANGESKERNEL) $(SYMKERNEL) $(CSTARTOBJ) $(COBJS) $(CBIN)
@@ -88,7 +88,7 @@ buildimg :
 	sudo cp -fv kernel.bin /mnt/floppy
 	sudo umount /mnt/floppy
 
-command : clean
+command :
 	tar vcf command/inst.tar -C command/ $(notdir $(CBIN))
 	dd if=command/inst.tar of=$(HD) seek=$(shell echo "obase=10;ibase=16;(`egrep -e '^ROOT_BASE' boot/include/load.inc | sed -e 's/.*0x//g'`+`egrep -e '#define[[:space:]]*INSTALL_START_SECT' include/sys/config.h | sed -e 's/.*0x//g'`)*200" | bc) bs=1 count=$(shell ls -l command/inst.tar | awk -F " " '{print $$5}') conv=notrunc
 

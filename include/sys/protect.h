@@ -93,6 +93,7 @@ struct tss {
 /* descriptor indices in LDT */
 #define INDEX_LDT_C             0
 #define INDEX_LDT_RW            1
+#define INDEX_LDT_SS            2
 
 /* 描述符类型值说明 */
 #define	DA_32			0x4000	/* 32 位段				*/

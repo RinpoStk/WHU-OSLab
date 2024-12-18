@@ -87,6 +87,17 @@ struct task {
 #define FIRST_PROC		proc_table[0]
 #define LAST_PROC		proc_table[NR_TASKS + NR_PROCS - 1]
 
+/* Number of queues */
+#define NR_QUEUES	3
+
+typedef struct proc_queue {
+    struct proc* queue[NR_TASKS + NR_PROCS + 1];
+    int head;
+    int tail;
+    int time_slice;
+    int queue_len;
+}PROC_QUEUE;
+
 /**
  * All forked proc will use memory above PROCS_BASE.
  *

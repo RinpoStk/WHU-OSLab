@@ -44,7 +44,41 @@ PUBLIC void task_mm()
 		int src = mm_msg.source;
 		int reply = 1;
 
+		// struct proc * p = proc_table;
+		// char * pname = p[src].name;
+
 		int msgtype = mm_msg.type;
+
+#ifdef ENABLE_FILE_LOG
+		switch (msgtype) {
+		case FORK:
+			syslog_file(MMLOG, "[PORC %s, PID %d, FORK];\n", pname, src);
+			break;
+		case EXIT:
+			syslog_file(MMLOG, "[PORC %s, PID %d, EXIT];\n", pname, src);
+			break;
+		case EXEC:
+			syslog_file(MMLOG, "[PORC %s, PID %d, EXEC];\n", pname, src);
+			break;
+		case WAIT:
+			syslog_file(MMLOG, "[PORC %s, PID %d, WAITIG];\n", pname, src);
+			break;
+		case GET_PNAME:
+			syslog_file(MMLOG, "[PORC %s, PID %d, GETNAME];\n", pname, src);
+			break;
+		// case FS_LOG:
+		// 	char * porcname = p[mm_msg.PID].name;
+		// 	printl("in mmmmmmmmm PID %d PNAME %s",mm_msg.PID ,porcname);
+		// 	break;
+		default:
+			// syslog_file("[PORC %s, PID %d, DO UNKNOW];\n", pname, src);
+			break;
+		}
+#endif
+
+		// int flags = mm_msg.FLAGS;
+		// if (flags == 10086)
+		// 	return 0;
 
 		switch (msgtype) {
 		case FORK:
@@ -67,6 +101,11 @@ PUBLIC void task_mm()
 		case KILL:
 		    mm_msg.RETVAL = do_kill(mm_msg.PID, mm_msg.STATUS);
 			break;
+		// case GET_PNAME:
+		// 	mm_msg.RETVAL = do_getpname(src);
+		// break;
+		// case FS_LOG:
+		// 	break;
 		default:
 			dump_msg("MM::unknown msg", &mm_msg);
 			assert(0);

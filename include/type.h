@@ -12,6 +12,10 @@
 #define	PUBLIC		/* PUBLIC is the opposite of PRIVATE */
 #define	PRIVATE	static	/* PRIVATE x limits the scope of x */
 
+#define bool 	_Bool
+#define true 	1
+#define false 	0
+
 typedef	unsigned long long	u64;
 typedef	unsigned int		u32;
 typedef	unsigned short		u16;

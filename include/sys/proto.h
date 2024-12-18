@@ -17,6 +17,8 @@ PUBLIC void	enable_int();
 PUBLIC void	port_read(u16 port, void* buf, int n);
 PUBLIC void	port_write(u16 port, void* buf, int n);
 PUBLIC void	glitter(int row, int col);
+PUBLIC u32  alloc_pages();
+
 
 /* string.asm */
 PUBLIC char*	strcpy(char* dst, const char* src);
@@ -33,6 +35,7 @@ PUBLIC int	get_kernel_map(unsigned int * b, unsigned int * l);
 PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
 PUBLIC char *	itoa(char * str, int num);
+PUBLIC int	random();
 
 /* kernel.asm */
 PUBLIC void restart();
@@ -116,6 +119,7 @@ PUBLIC int 		do_kill(int pid,int status);
 
 /* mm/exec.c */
 PUBLIC int		do_exec();
+// PUBLIC int		do_getpname(int pid);
 
 /* console.c */
 PUBLIC void out_char(CONSOLE* p_con, char ch);

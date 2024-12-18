@@ -46,9 +46,57 @@ PUBLIC void task_fs()
 		send_recv(RECEIVE, ANY, &fs_msg);
 
 		int msgtype = fs_msg.type;
-		int src = fs_msg.source;
+		int src = fs_msg.source;			// pid
+		// int src_1 = src;			// pid
 		pcaller = &proc_table[src];
+		// char * pname = pcaller->name;		// proc name
 
+#ifdef ENABLE_FILE_LOG
+		char * msg_name[128];
+		msg_name[OPEN]   = "OPEN";
+		msg_name[CLOSE]  = "CLOSE";
+		msg_name[READ]   = "READ";
+		msg_name[WRITE]  = "WRITE";
+		msg_name[LSEEK]  = "LSEEK";
+		msg_name[UNLINK] = "UNLINK";
+		msg_name[FORK]   = "FORK";
+		msg_name[EXIT]   = "EXIT";
+		msg_name[STAT]   = "STAT";
+		// printl("aaaain fs'open filelog\n");
+		switch (msgtype) {
+		case UNLINK:
+			// dump_fd_graph("%s just finished. (pid:%d)",
+			// 	      msg_name[msgtype], src);
+			//panic("");
+		case RESUME_PROC:
+			break;
+		case OPEN:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[OPEN]);
+		break;
+		case CLOSE:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[CLOSE]);
+		break;
+		case READ:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[READ]);
+		break;
+		case WRITE:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[WRITE]);
+		break;
+		case FORK:
+		case EXIT:
+		case LSEEK:
+		case STAT:
+		default:
+		if (strcmp(fs_msg.PATHNAME, ""))
+			// printl("fs_msg: %s\n", fs_msg.PATHNAME);
+			syslog_file(FSLOG, "[PORC %s, PID %d, OPERATE %s %s];\n", pname, src_1, msg_name[msgtype], fs_msg.PATHNAME);
+		else
+			syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[msgtype]);
+			break;
+		}
+#endif
+
+// printl("in fs'open filelog\n");
 		switch (msgtype) {
 		case OPEN:
 			fs_msg.FD = do_open();
@@ -105,13 +153,22 @@ PUBLIC void task_fs()
 				      msg_name[msgtype], src);
 			//panic("");
 		case OPEN:
+
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[OPEN]);
 		case CLOSE:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[CLOSE]);
 		case READ:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[READ]);
 		case WRITE:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[WRITE]);
 		case FORK:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[FORK]);
 		case EXIT:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[EXIT]);
 		case LSEEK:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[EXIT]);
 		case STAT:
+			syslog("[PORC %s, PID %d, %s]; ", name, src_1, msg_name[EXIT]);
 			break;
 		case RESUME_PROC:
 			break;
