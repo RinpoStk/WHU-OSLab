@@ -124,6 +124,11 @@ LABEL_START:			; <--- 从这里开始 *************
 	call	real_mode_disp_str
 	jmp	$
 .found:
+	nop
+	nop
+	nop
+	nop
+	nop
 	pop	bx
 	add	bx, [fs:SB_DIR_ENT_INODE_OFF]
 	mov	eax, [es:bx]		; eax <- inode nr of kernel
@@ -186,7 +191,7 @@ KernelFileName		db	"kernel.bin", 0	; KERNEL.BIN 之文件名
 MessageLength		equ	9
 LoadMessage:		db	"Loading  "
 Message1		db	"         "
-Message2		db	"in HD LDR"
+Message2		db	"LDR Ready"
 Message3		db	"No KERNEL"
 Message4		db	"Too Large"
 Message5		db	"Error 0  "

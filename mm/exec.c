@@ -108,3 +108,9 @@ PUBLIC int do_exec()
 
 	return 0;
 }
+
+// PUBLIC int do_getpname(int pid){
+// 	struct proc * p = proc_table;
+// 	char * pname = p[pid].name;
+// 	return pname;
+// }

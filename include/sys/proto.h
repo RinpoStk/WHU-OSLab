@@ -8,8 +8,8 @@
 /* kliba.asm */
 PUBLIC void	out_byte(u16 port, u8 value);
 PUBLIC u8	in_byte(u16 port);
-PUBLIC void	disp_str(char* info);
-PUBLIC void	disp_color_str(char* info, int color);
+PUBLIC void	disp_str(char * info);
+PUBLIC void	disp_color_str(char * info, int color);
 PUBLIC void	disable_irq(int irq);
 PUBLIC void	enable_irq(int irq);
 PUBLIC void	disable_int();
@@ -21,20 +21,21 @@ PUBLIC u32  alloc_pages();
 
 
 /* string.asm */
-PUBLIC char* strcpy(char* dst, const char* src);
+PUBLIC char*	strcpy(char* dst, const char* src);
 
 /* protect.c */
 PUBLIC void	init_prot();
 PUBLIC u32	seg2linear(u16 seg);
-PUBLIC void	init_desc(struct descriptor* p_desc,
-              u32 base, u32 limit, u16 attribute);
+PUBLIC void	init_desc(struct descriptor * p_desc,
+			  u32 base, u32 limit, u16 attribute);
 
 /* klib.c */
-PUBLIC void	get_boot_params(struct boot_params* pbp);
-PUBLIC int	get_kernel_map(unsigned int* b, unsigned int* l);
+PUBLIC void	get_boot_params(struct boot_params * pbp);
+PUBLIC int	get_kernel_map(unsigned int * b, unsigned int * l);
 PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
-PUBLIC char* itoa(char* str, int num);
+PUBLIC char *	itoa(char * str, int num);
+PUBLIC int	random();
 
 /* kernel.asm */
 PUBLIC void restart();
@@ -45,7 +46,7 @@ PUBLIC int  get_ticks();
 PUBLIC void TestA();
 PUBLIC void TestB();
 PUBLIC void TestC();
-PUBLIC void panic(const char* fmt, ...);
+PUBLIC void panic(const char *fmt, ...);
 
 /* i8259.c */
 PUBLIC void init_8259A();
@@ -76,11 +77,11 @@ PUBLIC void task_sys();
 /* fs/main.c */
 PUBLIC void			task_fs();
 PUBLIC int			rw_sector(int io_type, int dev, u64 pos,
-                      int bytes, int proc_nr, void* buf);
-PUBLIC struct inode* get_inode(int dev, int num);
-PUBLIC void			put_inode(struct inode* pinode);
-PUBLIC void			sync_inode(struct inode* p);
-PUBLIC struct super_block* get_super_block(int dev);
+					  int bytes, int proc_nr, void * buf);
+PUBLIC struct inode *		get_inode(int dev, int num);
+PUBLIC void			put_inode(struct inode * pinode);
+PUBLIC void			sync_inode(struct inode * p);
+PUBLIC struct super_block *	get_super_block(int dev);
 
 /* fs/open.c */
 PUBLIC int		do_open();
@@ -95,14 +96,14 @@ PUBLIC int		do_unlink();
 
 /* fs/misc.c */
 PUBLIC int		do_stat();
-PUBLIC int		strip_path(char* filename, const char* pathname,
-                   struct inode** ppinode);
-PUBLIC int		search_file(char* path);
+PUBLIC int		strip_path(char * filename, const char * pathname,
+				   struct inode** ppinode);
+PUBLIC int		search_file(char * path);
 
 /* fs/disklog.c */
 PUBLIC int		do_disklog();
-PUBLIC int		disklog(char* logstr); /* for debug */
-PUBLIC void		dump_fd_graph(const char* fmt, ...);
+PUBLIC int		disklog(char * logstr); /* for debug */
+PUBLIC void		dump_fd_graph(const char * fmt, ...);
 
 /* mm/main.c */
 PUBLIC void		task_mm();
@@ -113,9 +114,12 @@ PUBLIC int		free_mem(int pid);
 PUBLIC int		do_fork();
 PUBLIC void		do_exit(int status);
 PUBLIC void		do_wait();
+PUBLIC int 		do_kill(int pid,int status);
+// PUBLIC void		do_kill(int pid, int status);
 
 /* mm/exec.c */
 PUBLIC int		do_exec();
+// PUBLIC int		do_getpname(int pid);
 
 /* console.c */
 PUBLIC void out_char(CONSOLE* p_con, char ch);
@@ -126,23 +130,27 @@ PUBLIC int  is_current_console(CONSOLE* p_con);
 
 /* proc.c */
 PUBLIC	void	schedule();
-PUBLIC	void* va2la(int pid, void* va);
+PUBLIC	void*	va2la(int pid, void* va);
 PUBLIC	int	ldt_seg_linear(struct proc* p, int idx);
 PUBLIC	void	reset_msg(MESSAGE* p);
-PUBLIC	void	dump_msg(const char* title, MESSAGE* m);
-PUBLIC	void	dump_proc(struct proc* p);
+PUBLIC	void	dump_msg(const char * title, MESSAGE* m);
+PUBLIC	void	dump_proc(struct proc * p);
 PUBLIC	int	send_recv(int function, int src_dest, MESSAGE* msg);
 PUBLIC void	inform_int(int task_nr);
 
 /* lib/misc.c */
-PUBLIC void spin(char* func_name);
+PUBLIC void spin(char * func_name);
+
+// log
+PUBLIC void task_log(void);
+void init_sys_file(void);
 
 /* 以下是系统调用相关 */
 
 /* 系统调用 - 系统级 */
 /* proc.c */
 PUBLIC	int	sys_sendrec(int function, int src_dest, MESSAGE* m, struct proc* p);
-PUBLIC	int	sys_printx(int _unused1, int _unused2, char* s, struct proc* p_proc);
+PUBLIC	int	sys_printx(int _unused1, int _unused2, char* s, struct proc * p_proc);
 
 /* syscall.asm */
 PUBLIC  void    sys_call();             /* int_handler */

@@ -1,3 +1,4 @@
+
 ; ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ;                               hdboot.asm
 ; ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -14,14 +15,14 @@ STACK_BASE		equ	0x7C00	; base address of stack when booting
 TRANS_SECT_NR		equ	2
 SECT_BUF_SIZE		equ	TRANS_SECT_NR * 512
 
-disk_address_packet:	db	0x10		; [ 0] Packet size in bytes.
+disk_address_packet:	db	0x10		; [ 0] Packet size in bytes. Must be 0x10 or greater.
 			db	0		; [ 1] Reserved, must be 0.
-			db	TRANS_SECT_NR	; [ 2] Nr of blocks to transfer.
+sect_cnt:		db	TRANS_SECT_NR	; [ 2] Number of blocks to transfer.
 			db	0		; [ 3] Reserved, must be 0.
-			dw	0		; [ 4] Addr of transfer - Offset
-			dw	SUPER_BLK_SEG	; [ 6] buffer.          - Seg
-			dd	0		; [ 8] LBA. Low  32-bits.
-			dd	0		; [12] LBA. High 32-bits.
+			dw	0		; [ 4] Address of transfer buffer. Offset
+			dw	SUPER_BLK_SEG	; [ 6]                             Seg
+lba_addr:		dd	0		; [ 8] Starting LBA address. Low  32-bits.
+			dd	0		; [12] Starting LBA address. High 32-bits.
 
 	
 err:
@@ -81,11 +82,6 @@ boot_start:
 	add	bx, [fs:SB_DIR_ENT_SIZE]
 	sub	ecx, [fs:SB_DIR_ENT_SIZE]
 	jz	.not_found
-
-	mov	dx, SECT_BUF_SIZE
-	cmp	bx, dx
-	jge	.not_found
-
 	push	bx
 	mov	si, LoaderFileName
 	jmp	.str_cmp
@@ -94,6 +90,9 @@ boot_start:
 	call	disp_str
 	jmp	$
 .found:
+	nop
+	nop
+	nop
 	pop	bx
 	add	bx, [fs:SB_DIR_ENT_INODE_OFF]
 	mov	eax, [es:bx]		; eax <- inode nr of loader
@@ -118,11 +117,11 @@ load_loader:
 ;============================================================================
 ;字符串
 ;----------------------------------------------------------------------------
-LoaderFileName		db	"hdldr.bin", 0	; LOADER 之文件名
+LoaderFileName		db	"hdloader.bin", 0	; LOADER.BIN 之文件名
 ; 为简化代码, 下面每个字符串的长度均为 MessageLength
 MessageLength		equ	9
 BootMessage:		db	"Booting  "; 9字节, 不够则用空格补齐. 序号 0
-Message1		db	"HD Boot  "; 9字节, 不够则用空格补齐. 序号 1
+Message1		db	"BootReady"; 9字节, 不够则用空格补齐. 序号 1
 Message2		db	"No LOADER"; 9字节, 不够则用空格补齐. 序号 2
 Message3		db	"Error 0  "; 9字节, 不够则用空格补齐. 序号 3
 ;============================================================================
@@ -157,15 +156,18 @@ disp_str:
 ;----------------------------------------------------------------------------
 ; read_sector
 ;----------------------------------------------------------------------------
-; Entry:
+; before:
 ;     - fields disk_address_packet should have been filled
 ;       before invoking the routine
-; Exit:
+; after:
 ;     - es:bx -> data read
 ; registers changed:
 ;     - eax, ebx, dl, si, es
 read_sector:
 	xor	ebx, ebx
+
+	;mov	dword [disk_address_packet +  8], eax
+	mov	dword [disk_address_packet + 12], 0
 
 	mov	ah, 0x42
 	mov	dl, 0x80
@@ -181,18 +183,18 @@ read_sector:
 ;----------------------------------------------------------------------------
 ; get_inode
 ;----------------------------------------------------------------------------
-; Entry:
+; before:
 ;     - eax    : inode nr.
-; Exit:
+; after:
 ;     - eax    : sector nr.
 ;     - ecx    : the_inode.i_size
 ;     - es:ebx : inodes sector buffer
 ; registers changed:
 ;     - eax, ebx, ecx, edx
 get_inode:
-	dec	eax			; eax <-  inode_nr -1
+	dec	eax				; eax <-  inode_nr -1
 	mov	bl, [fs:SB_INODE_SIZE]
-	mul	bl			; eax <- (inode_nr - 1) * INODE_SIZE
+	mul	bl				; eax <- (inode_nr - 1) * INODE_SIZE
 	mov	edx, SECT_BUF_SIZE
 	sub	edx, dword [fs:SB_INODE_SIZE]
 	cmp	eax, edx
@@ -205,21 +207,20 @@ get_inode:
 	mov	dword [disk_address_packet +  8], eax
 	call	read_sector
 
-	pop	eax			; [es:ebx+eax] -> the inode
+	pop	eax				; [es:ebx+eax] -> the inode
 
 	mov	edx, dword [fs:SB_INODE_ISIZE_OFF]
 	add	edx, ebx
-	add	edx, eax		; [es:edx] -> the_inode.i_size
-	mov	ecx, [es:edx]		; ecx <- the_inode.i_size
+	add	edx, eax			; [es:edx] -> the_inode.i_size
+	mov	ecx, [es:edx]			; ecx <- the_inode.i_size
 
-	; es:[ebx+eax] -> the_inode.i_start_sect
-	add	ax, word [fs:SB_INODE_START_OFF]
+	add	ax, word [fs:SB_INODE_START_OFF]; es:[ebx+eax] -> the_inode.i_start_sect
 
 	add	bx, ax
 	mov	eax, [es:bx]
-	add	eax, ROOT_BASE		; eax <- the_inode.i_start_sect
+	add	eax, ROOT_BASE			; eax <- the_inode.i_start_sect
 	ret
 
 
-times 	510-($-$$) db 0 ; 填充剩下的空间，使生成的二进制代码恰好为512字节
-dw 	0xaa55		; 结束标志
+times 	510-($-$$)	db	0	; 填充剩下的空间，使生成的二进制代码恰好为512字节
+dw 	0xaa55				; 结束标志

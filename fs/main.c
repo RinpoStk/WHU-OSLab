@@ -27,6 +27,7 @@ PRIVATE void mkfs();
 PRIVATE void read_super_block(int dev);
 PRIVATE int fs_fork();
 PRIVATE int fs_exit();
+PRIVATE int do_search_file();
 
 /*****************************************************************************
  *                                task_fs
@@ -45,9 +46,56 @@ PUBLIC void task_fs()
 		send_recv(RECEIVE, ANY, &fs_msg);
 
 		int msgtype = fs_msg.type;
-		int src = fs_msg.source;
+		int src = fs_msg.source;			// pid
 		pcaller = &proc_table[src];
+		char * pname = pcaller->name;		// proc name
 
+#ifdef ENABLE_FILE_LOG
+		char * msg_name[128];
+		msg_name[OPEN]   = "OPEN";
+		msg_name[CLOSE]  = "CLOSE";
+		msg_name[READ]   = "READ";
+		msg_name[WRITE]  = "WRITE";
+		msg_name[LSEEK]  = "LSEEK";
+		msg_name[UNLINK] = "UNLINK";
+		msg_name[FORK]   = "FORK";
+		msg_name[EXIT]   = "EXIT";
+		msg_name[STAT]   = "STAT";
+		// printl("aaaain fs'open filelog\n");
+		switch (msgtype) {
+		case UNLINK:
+			// dump_fd_graph("%s just finished. (pid:%d)",
+			// 	      msg_name[msgtype], src);
+			//panic("");
+		case RESUME_PROC:
+			break;
+		case OPEN:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[OPEN]);
+		break;
+		case CLOSE:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[CLOSE]);
+		break;
+		case READ:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[READ]);
+		break;
+		case WRITE:
+		// syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[WRITE]);
+		break;
+		case FORK:
+		case EXIT:
+		case LSEEK:
+		case STAT:
+		default:
+		if (strcmp(fs_msg.PATHNAME, ""))
+			// printl("fs_msg: %s\n", fs_msg.PATHNAME);
+			syslog_file(FSLOG, "[PORC %s, PID %d, OPERATE %s %s];\n", pname, src, msg_name[msgtype], fs_msg.PATHNAME);
+		else
+			syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
+			break;
+		}
+#endif
+
+// printl("in fs'open filelog\n");
 		switch (msgtype) {
 		case OPEN:
 			fs_msg.FD = do_open();
@@ -62,6 +110,9 @@ PUBLIC void task_fs()
 		case UNLINK:
 			fs_msg.RETVAL = do_unlink();
 			break;
+		// case SEARCH:
+        //     fs_msg.RETVAL = do_search_file();
+        //     break;
 		case RESUME_PROC:
 			src = fs_msg.PROC_NR;
 			break;
@@ -101,13 +152,22 @@ PUBLIC void task_fs()
 				      msg_name[msgtype], src);
 			//panic("");
 		case OPEN:
+
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[OPEN]);
 		case CLOSE:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[CLOSE]);
 		case READ:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[READ]);
 		case WRITE:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[WRITE]);
 		case FORK:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[FORK]);
 		case EXIT:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[EXIT]);
 		case LSEEK:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[EXIT]);
 		case STAT:
+			syslog("[PORC %s, PID %d, %s]; ", name, src, msg_name[EXIT]);
 			break;
 		case RESUME_PROC:
 			break;
@@ -598,4 +658,54 @@ PRIVATE int fs_exit()
 	}
 	return 0;
 }
+// PRIVATE int do_search_file()
+// {
+//     char pathname[MAX_PATH];
+//     char filenames[128][MAX_FILENAME_LEN];
+//     int file_count = 0;
 
+//     /* get parameters from the message */
+//     int name_len = fs_msg.NAME_LEN;
+//     int src = fs_msg.source;
+//     assert(name_len < MAX_PATH);
+//     phys_copy((void*)va2la(TASK_FS, pathname),
+//               (void*)va2la(src, fs_msg.PATHNAME),
+//               name_len);
+//     pathname[name_len] = 0;
+
+//     char filename[MAX_PATH];
+//     struct inode *dir_inode;
+
+//     if (strip_path(filename, pathname, &dir_inode) != 0)
+//         return 0;
+
+//     int dir_blk0_nr = dir_inode->i_start_sect;
+//     int nr_dir_blks = (dir_inode->i_size + SECTOR_SIZE - 1) / SECTOR_SIZE;
+//     int nr_dir_entries = dir_inode->i_size / DIR_ENTRY_SIZE;
+
+//     struct dir_entry *pde;
+
+//     for (int i = 0; i < nr_dir_blks; i++) {
+//         RD_SECT(dir_inode->i_dev, dir_blk0_nr + i);
+//         pde = (struct dir_entry *)fsbuf;
+//         for (int j = 0; j < SECTOR_SIZE / DIR_ENTRY_SIZE; j++, pde++) {
+//             if (pde->inode_nr != INVALID_INODE) {
+//                 strncpy(filenames[file_count], pde->name, MAX_FILENAME_LEN);
+//                 filenames[file_count][MAX_FILENAME_LEN - 1] = 0; // Ensure null-termination
+//                 file_count++;
+//                 if (file_count >= 128)
+//                     break; // Reached maximum number of files
+//             }
+//             if (file_count > nr_dir_entries)
+//                 break;
+//         }
+//         if (file_count > nr_dir_entries)
+//             break;
+//     }
+
+//     /* send the result back to the caller */
+//     fs_msg.CNT = file_count;
+//     phys_copy((void*)va2la(src, fs_msg.BUF), (void*)filenames, file_count * MAX_FILENAME_LEN);
+
+//     return 0;
+// }

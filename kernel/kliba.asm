@@ -312,7 +312,7 @@ find_free_pages:
     push ebx
     push edi
     push esi
-    mov dword [ebp-16],0  ; push 0  
+    mov dword [ebp-16],0  ; push 0
     mov dword [ebp-20],0  ; push 0
     xor ebx,ebx
     mov edi,0xffffffff
@@ -330,12 +330,12 @@ find_free_pages:
 
     dec edx
     cmp edi,edx
-    
+
     je .pageAllocErr
 
 .pass:
     mov eax, [PageDirBase]
-    
+
     and eax,0xfffff000
     mov ebx,[eax+edi*4]
     and ebx,0xfffff000
@@ -404,7 +404,7 @@ alloc_pages:
     push dword [ebp+8]
     call find_free_pages
     add esp,4
-    
+
 
 
     ; mov [ebp-4],eax         ;push eax
@@ -416,11 +416,11 @@ alloc_pages:
     ; call disp_int
     ; add esp,4
     ; ret
-    
+
     mov ebx,[ebp-16]
     shr ebx,22
     mov eax, [PageDirBase]
-    
+
     and eax,0xfffff000
     mov edi,ebx
     mov ebx,[eax+edi*4]
@@ -451,12 +451,12 @@ alloc_pages:
 
     mov ecx,0                   ;一个PDE对应的页已经分配完毕，开始分配下一个PDE的页
     mov eax, [PageDirBase]
-    
+
     and eax,0xfffff000
     inc edi
     mov ebx,[eax+edi*4]
     or ebx,1
-    mov [eax+edi*4],ebx          
+    mov [eax+edi*4],ebx
     and ebx,0xfffff000
     jmp .1
 
@@ -491,12 +491,12 @@ free_pages:
     push esi
 
     xchg bx,bx
-    mov dword [ebp-16],0    ; push 0  
+    mov dword [ebp-16],0    ; push 0
 
     mov ebx,[ebp+12]
     shr ebx,22
     mov eax, [PageDirBase]
-    
+
     and eax,0xfffff000
     mov edi,ebx
     mov ebx,[eax+edi*4]
@@ -526,7 +526,7 @@ free_pages:
 
     mov ecx,0
     mov eax, [PageDirBase]
-    
+
     and eax,0xfffff000
 
     cmp edx,0                 ;若一个PDE对应的所有PTE均被释放则释放PDE

@@ -135,6 +135,7 @@ PUBLIC int	fork		();
 
 /* lib/exit.c */
 PUBLIC void	exit		(int status);
+PUBLIC int  kill		(int pid);
 
 /* lib/wait.c */
 PUBLIC int	wait		(int * status);
@@ -149,6 +150,8 @@ PUBLIC int	stat		(const char *path, struct stat *buf);
 
 /* lib/syslog.c */
 PUBLIC	int	syslog		(const char *fmt, ...);
+
+PUBLIC int atoi(const char *str);
 
 
 #endif /* _ORANGES_STDIO_H_ */

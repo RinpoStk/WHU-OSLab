@@ -20,6 +20,7 @@
 #include "global.h"
 #include "proto.h"
 #include "hd.h"
+#include "config.h"
 
 
 PRIVATE void	init_hd			();
@@ -60,7 +61,45 @@ PUBLIC void task_hd()
 	while (1) {
 		send_recv(RECEIVE, ANY, &msg);
 
+		struct proc * p = proc_table;
 		int src = msg.source;
+		int msgtype = msg.type;
+		char * pname = p[src].name;
+		int drive = DRV_OF_DEV(msg.DEVICE);
+
+#ifdef ENABLE_FILE_LOG
+		char * msg_name[128];
+		msg_name[DEV_OPEN]   = "DEV_OPEN";
+		msg_name[DEV_CLOSE]   = "DEV_CLOSE";
+		msg_name[DEV_READ]  = "DEV_READ";
+		msg_name[DEV_WRITE]   = "DEV_WRITE";
+		msg_name[DEV_IOCTL]   = "DEV_IOCTL";
+		// printl("1111111\n");
+		switch (msg.type) {
+		case DEV_OPEN:
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
+			break;
+
+		case DEV_CLOSE:
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
+			break;
+
+		case DEV_READ:
+		case DEV_WRITE:
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
+			break;
+
+		case DEV_IOCTL:
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
+			break;
+
+		default:
+			// dump_msg("HD driver::unknown msg", &msg);
+			// spin("FS::main_loop (invalid msg.type)");
+			break;
+		}
+#endif
+
 
 		switch (msg.type) {
 		case DEV_OPEN:

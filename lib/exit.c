@@ -37,3 +37,28 @@ PUBLIC void exit(int status)
 	send_recv(BOTH, TASK_MM, &msg);
 	assert(msg.type == SYSCALL_RET);
 }
+
+// PUBLIC void kill(int pid,int status)
+// {
+// 	MESSAGE msg;
+// 	msg.type	= KILL;
+// 	msg.STATUS	= status;
+// 	msg.PID = pid;
+
+// 	send_recv(BOTH, TASK_MM, &msg);
+// 	assert(msg.type == SYSCALL_RET);
+// }
+
+PUBLIC int kill(int pid) {
+    MESSAGE msg;
+    memset(&msg, 0, sizeof(MESSAGE));
+    msg.type = KILL;
+    msg.PID = pid;
+    msg.STATUS = -1; 
+
+    if (send_recv(BOTH, TASK_MM, &msg) != 0) {
+        return -1; 
+    }
+
+    return msg.RETVAL;
+}

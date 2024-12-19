@@ -34,7 +34,7 @@ BOOT_PARAM_MAGIC	equ	0xB007
 ;; but define it as a macro for two reasons:
 ;; 1. it is a constant for any certain system
 ;; 2. it simplifies boot sector and loader
-ROOT_BASE		equ	0xF000
+ROOT_BASE		equ	0x4EFF
 
 ;; corresponding with include/sys/fs.h
 SB_MAGIC_V1		equ	0x111

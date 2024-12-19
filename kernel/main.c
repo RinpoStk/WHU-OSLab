@@ -1,4 +1,3 @@
-
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                             main.c
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -25,19 +24,17 @@
  * jmp from kernel.asm::_start.
  *
  *****************************************************************************/
-PUBLIC int kernel_main()
-{
+PUBLIC int kernel_main() {
     disp_str("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
     int i, j, eflags, prio;
-    u8  rpl;
-    u8  priv; /* privilege */
+    u8 rpl;
+    u8 priv; /* privilege */
 
-    struct task* t;
-    struct proc* p = proc_table;
-    PROC_QUEUE* p_queue = MLFQ;
+    struct task *t;
+    struct proc *p = proc_table;
+    PROC_QUEUE *p_queue = MLFQ;
 
-    char* stk = task_stack + STACK_SIZE_TOTAL;
+    char *stk = task_stack + STACK_SIZE_TOTAL;
 
     for (i = 0; i < NR_TASKS + NR_PROCS; i++, p++, t++) {
         if (i >= NR_TASKS + NR_NATIVE_PROCS) {
@@ -45,22 +42,23 @@ PUBLIC int kernel_main()
             continue;
         }
 
-        if (i < NR_TASKS) {     /* TASK */
+        if (i < NR_TASKS) {
+            /* TASK */
             t = task_table + i;
             priv = PRIVILEGE_TASK;
             rpl = RPL_TASK;
-            eflags = 0x1202;/* IF=1, IOPL=1, bit 2 is always 1 */
-            prio = 15;
-        }
-        else {                  /* USER PROC */
+            eflags = 0x1202; /* IF=1, IOPL=1, bit 2 is always 1 */
+            prio = 15000;
+        } else {
+            /* USER PROC */
             t = user_proc_table + (i - NR_TASKS);
             priv = PRIVILEGE_USER;
             rpl = RPL_USER;
-            eflags = 0x202;	/* IF=1, bit 2 is always 1 */
-            prio = 5;
+            eflags = 0x202; /* IF=1, bit 2 is always 1 */
+            prio = 13;
         }
 
-        strcpy(p->name, t->name);	/* name of the process */
+        strcpy(p->name, t->name); /* name of the process */
         p->p_parent = NO_TASK;
 
         if (strcmp(t->name, "INIT") != 0) {
@@ -70,37 +68,37 @@ PUBLIC int kernel_main()
             /* change the DPLs */
             p->ldts[INDEX_LDT_C].attr1 = DA_C | priv << 5;
             p->ldts[INDEX_LDT_RW].attr1 = DA_DRW | priv << 5;
-        }
-        else {		/* INIT process */
+        } else {
+            /* INIT process */
             unsigned int k_base;
             unsigned int k_limit;
             int ret = get_kernel_map(&k_base, &k_limit);
             assert(ret == 0);
             init_desc(&p->ldts[INDEX_LDT_C],
-                  0, /* bytes before the entry point
-                      * are useless (wasted) for the
-                      * INIT process, doesn't matter
-                      */
-                  (k_base + k_limit) >> LIMIT_4K_SHIFT,
-                  DA_32 | DA_LIMIT_4K | DA_C | priv << 5);
+                      0, /* bytes before the entry point
+				      * are useless (wasted) for the
+				      * INIT process, doesn't matter
+				      */
+                      (k_base + k_limit) >> LIMIT_4K_SHIFT,
+                      DA_32 | DA_LIMIT_4K | DA_C | priv << 5);
 
             init_desc(&p->ldts[INDEX_LDT_RW],
-                  0, /* bytes before the entry point
-                      * are useless (wasted) for the
-                      * INIT process, doesn't matter
-                      */
-                  (k_base + k_limit) >> LIMIT_4K_SHIFT,
-                  DA_32 | DA_LIMIT_4K | DA_DRW | priv << 5);
+                      0, /* bytes before the entry point
+				      * are useless (wasted) for the
+				      * INIT process, doesn't matter
+				      */
+                      (k_base + k_limit) >> LIMIT_4K_SHIFT,
+                      DA_32 | DA_LIMIT_4K | DA_DRW | priv << 5);
         }
 
         p->regs.cs = INDEX_LDT_C << 3 | SA_TIL | rpl;
         p->regs.ds =
-            p->regs.es =
-            p->regs.fs =
-            p->regs.ss = INDEX_LDT_RW << 3 | SA_TIL | rpl;
+                p->regs.es =
+                p->regs.fs =
+                p->regs.ss = INDEX_LDT_RW << 3 | SA_TIL | rpl;
         p->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK) | rpl;
-        p->regs.eip = (u32)t->initial_eip;
-        p->regs.esp = (u32)stk;
+        p->regs.eip = (u32) t->initial_eip;
+        p->regs.esp = (u32) stk;
         p->regs.eflags = eflags;
 
         p->ticks = p->priority = prio;
@@ -125,34 +123,33 @@ PUBLIC int kernel_main()
     p_proc_ready = proc_table;
 
     //init process queue
-    for (i = 0; i < NR_QUEUES; i++)
-    {
+    for (i = 0; i < NR_QUEUES; i++) {
         p_queue[i].head = 0;
         p_queue[i].tail = 0;
         p_queue[i].time_slice = i + 1;
         p_queue[i].queue_len = NR_TASKS + NR_PROCS + 1;
     }
-    for (i = 0;i < NR_TASKS + NR_PROCS;i++)
-    {
+    for (i = 0; i < NR_TASKS + NR_PROCS; i++) {
         p_queue->queue[p_queue->tail] = &proc_table[i];
         p_queue->tail = (p_queue->tail + 1) % p_queue->queue_len;
         cur_time_slice[proc2pid(&proc_table[i])] = p_queue->time_slice;
     }
+    // proc_table[7].ticks = proc_table[8].ticks = proc_table[9].ticks = 15;
     // disp_int(p_queue->queue[p_queue->head]);
     init_clock();
     init_keyboard();
 
     restart();
 
-    while (1){}
+    while (1) {
+    }
 }
 
 
 /*****************************************************************************
  *                                get_ticks
  *****************************************************************************/
-PUBLIC int get_ticks()
-{
+PUBLIC int get_ticks() {
     MESSAGE msg;
     reset_msg(&msg);
     msg.type = GET_TICKS;
@@ -165,24 +162,24 @@ PUBLIC int get_ticks()
  * @struct posix_tar_header
  * Borrowed from GNU `tar'
  */
-struct posix_tar_header
-{				/* byte offset */
-    char name[100];		/*   0 */
-    char mode[8];		/* 100 */
-    char uid[8];		/* 108 */
-    char gid[8];		/* 116 */
-    char size[12];		/* 124 */
-    char mtime[12];		/* 136 */
-    char chksum[8];		/* 148 */
-    char typeflag;		/* 156 */
-    char linkname[100];	/* 157 */
-    char magic[6];		/* 257 */
-    char version[2];	/* 263 */
-    char uname[32];		/* 265 */
-    char gname[32];		/* 297 */
-    char devmajor[8];	/* 329 */
-    char devminor[8];	/* 337 */
-    char prefix[155];	/* 345 */
+struct posix_tar_header {
+    /* byte offset */
+    char name[100]; /*   0 */
+    char mode[8]; /* 100 */
+    char uid[8]; /* 108 */
+    char gid[8]; /* 116 */
+    char size[12]; /* 124 */
+    char mtime[12]; /* 136 */
+    char chksum[8]; /* 148 */
+    char typeflag; /* 156 */
+    char linkname[100]; /* 157 */
+    char magic[6]; /* 257 */
+    char version[2]; /* 263 */
+    char uname[32]; /* 265 */
+    char gname[32]; /* 297 */
+    char devmajor[8]; /* 329 */
+    char devminor[8]; /* 337 */
+    char prefix[155]; /* 345 */
     /* 500 */
 };
 
@@ -194,8 +191,7 @@ struct posix_tar_header
  *
  * @param filename The tar file.
  *****************************************************************************/
-void untar(const char* filename)
-{
+void untar(const char *filename) {
     printf("[extract `%s'\n", filename);
     int fd = open(filename, O_RDWR);
     assert(fd != -1);
@@ -208,8 +204,8 @@ void untar(const char* filename)
     while (1) {
         bytes = read(fd, buf, SECTOR_SIZE);
         assert(bytes == SECTOR_SIZE); /* size of a TAR file
-                           * must be multiple of 512
-                           */
+					       * must be multiple of 512
+					       */
         if (buf[0] == 0) {
             if (i == 0)
                 printf("    need not unpack the file.\n");
@@ -217,10 +213,10 @@ void untar(const char* filename)
         }
         i++;
 
-        struct posix_tar_header* phdr = (struct posix_tar_header*)buf;
+        struct posix_tar_header *phdr = (struct posix_tar_header *) buf;
 
         /* calculate the file size */
-        char* p = phdr->size;
+        char *p = phdr->size;
         int f_len = 0;
         while (*p)
             f_len = (f_len * 8) + (*p++ - '0'); /* octal */
@@ -233,7 +229,7 @@ void untar(const char* filename)
             close(fd);
             return;
         }
-        printf("    %s", phdr->name);
+        printf("    %s\n", phdr->name);
         while (bytes_left) {
             int iobytes = min(chunk, bytes_left);
             read(fd, buf,
@@ -267,8 +263,7 @@ void untar(const char* filename)
  *
  * @param tty_name  TTY file name.
  *****************************************************************************/
-void shabby_shell(const char* tty_name)
-{
+void shabby_shell(const char *tty_name) {
     int fd_stdin = open(tty_name, O_RDWR);
     assert(fd_stdin == 0);
     int fd_stdout = open(tty_name, O_RDWR);
@@ -282,9 +277,9 @@ void shabby_shell(const char* tty_name)
         rdbuf[r] = 0;
 
         int argc = 0;
-        char* argv[PROC_ORIGIN_STACK];
-        char* p = rdbuf;
-        char* s;
+        char *argv[PROC_ORIGIN_STACK];
+        char *p = rdbuf;
+        char *s;
         int word = 0;
         char ch;
         do {
@@ -309,15 +304,15 @@ void shabby_shell(const char* tty_name)
                 write(1, rdbuf, r);
                 write(1, "}\n", 2);
             }
-        }
-        else {
+        } else {
             close(fd);
             int pid = fork();
-            if (pid != 0) { /* parent */
+            if (pid != 0) {
+                /* parent */
                 int s;
                 wait(&s);
-            }
-            else {	/* child */
+            } else {
+                /* child */
                 execv(argv[0], argv);
             }
         }
@@ -334,8 +329,7 @@ void shabby_shell(const char* tty_name)
  * The hen.
  *
  *****************************************************************************/
-void Init()
-{
+void Init() {
     int fd_stdin = open("/dev_tty0", O_RDWR);
     assert(fd_stdin == 0);
     int fd_stdout = open("/dev_tty0", O_RDWR);
@@ -347,15 +341,16 @@ void Init()
     untar("/cmd.tar");
 
 
-    char* tty_list[] = { "/dev_tty1", "/dev_tty2" };
+    char *tty_list[] = {"/dev_tty1", "/dev_tty2"};
 
     int i;
     for (i = 0; i < sizeof(tty_list) / sizeof(tty_list[0]); i++) {
         int pid = fork();
-        if (pid != 0) { /* parent process */
+        if (pid != 0) {
+            /* parent process */
             printf("[parent is running, child pid:%d]\n", pid);
-        }
-        else {	/* child process */
+        } else {
+            /* child process */
             printf("[child is running, pid:%d]\n", getpid());
             close(fd_stdin);
             close(fd_stdout);
@@ -378,49 +373,70 @@ void Init()
 /*======================================================================*
                                TestA
  *======================================================================*/
-void TestA()
-{
-    for (;;)
-    {
-        printl("A ");
-        milli_delay(1000);
+void TestA() {
+    // int fd_stdin  = open("/dev_tty0", O_RDWR);
+    // assert(fd_stdin  == 0);
+    // int fd_stdout = open("/dev_tty0", O_RDWR);
+    // assert(fd_stdout == 1);
+    // // ProcInfo proc_info_array[64];
+    // // int proc_count = get_proc_info(proc_info_array, 64);
+    // char *files;
+    // files = search_dir("/");
+    // printf("%s",files);
+    while (1) {
+        // milli_delay(10000);
+        //
+        // if (mm_buffull_flag) {
+        // 	filelog(MMLOG, mm_log_file);
+        // }
+        //
+        // if (fs_buffull_flag) {
+        // 	// handle fs_log_bufpos overflow
+        // 	filelog(FSLOG, fs_log_file);
+        // }
+        //
+        // if (sys_buffull_flag) {
+        // 	// handle sys_log_bufpos overflow
+        // 	filelog(SYSLOG, sys_log_file);
+        // }
+        //
+        // if (hd_buffull_flag) {
+        // 	// handle hd_log_bufpos overflow
+        // 	filelog(HDLOG, hd_log_file);
+        // }
     }
+
+    // for(;;){
+    // 	printf("PID\tNAME\n");
+    // 	for (int i = 0; i < proc_count; i++) {
+    //     	printf("%d\t%s\n", proc_info_array[i].pid, proc_info_array[i].name);
+    // 	}
+    // }
 }
 
 /*======================================================================*
                                TestB
  *======================================================================*/
-void TestB()
-{
-    for (;;)
-    {
-        printl("B ");
-        milli_delay(1000);
-    }
+void TestB() {
+    for (;;);
 }
 
 /*======================================================================*
                                TestB
  *======================================================================*/
-void TestC()
-{
-    for (;;)
-    {
-        printl("C ");
-        milli_delay(1000);
-    }
+void TestC() {
+    for (;;);
 }
 
 /*****************************************************************************
  *                                panic
  *****************************************************************************/
-PUBLIC void panic(const char* fmt, ...)
-{
+PUBLIC void panic(const char *fmt, ...) {
     int i;
     char buf[256];
 
     /* 4 is the size of fmt in the stack */
-    va_list arg = (va_list)((char*)&fmt + 4);
+    va_list arg = (va_list) ((char *) &fmt + 4);
 
     i = vsprintf(buf, fmt, arg);
 
@@ -429,4 +445,3 @@ PUBLIC void panic(const char* fmt, ...)
     /* should never arrive here */
     __asm__ __volatile__("ud2");
 }
-

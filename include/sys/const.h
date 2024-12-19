@@ -137,7 +137,8 @@
 #define TASK_HD		2
 #define TASK_FS		3
 #define TASK_MM		4
-#define INIT		5
+#define TASK_LOG	5
+#define INIT		6
 #define ANY		(NR_TASKS + NR_PROCS + 10)
 #define NO_TASK		(NR_TASKS + NR_PROCS + 20)
 
@@ -170,10 +171,10 @@ enum msgtype {
 	GET_TICKS, GET_PID, GET_RTC_TIME,
 
 	/* FS */
-	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK,
+	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, SEARCH,
 
 	/* FS & TTY */
-	SUSPEND_PROC, RESUME_PROC,
+	SUSPEND_PROC, RESUME_PROC, GET_PROC_INFO,
 
 	/* MM */
 	EXEC, WAIT,
@@ -184,6 +185,11 @@ enum msgtype {
 	/* TTY, SYS, FS, MM, etc */
 	SYSCALL_RET,
 
+	KILL,
+
+	// GET_PNAME,
+	FS_LOG,					// FS_LOG for fs send msg to mm
+
 	/* message type for drivers */
 	DEV_OPEN = 1001,
 	DEV_CLOSE,
@@ -193,31 +199,23 @@ enum msgtype {
 };
 
 /* macros for messages */
-#define	FD		u.m3.m3i1
+#define	FD			u.m3.m3i1
 #define	PATHNAME	u.m3.m3p1
 #define	FLAGS		u.m3.m3i1
 #define	NAME_LEN	u.m3.m3i2
 #define	BUF_LEN		u.m3.m3i3
-#define	CNT		u.m3.m3i2
+#define	CNT			u.m3.m3i2
 #define	REQUEST		u.m3.m3i2
 #define	PROC_NR		u.m3.m3i3
 #define	DEVICE		u.m3.m3i4
 #define	POSITION	u.m3.m3l1
-#define	BUF		u.m3.m3p2
+#define	BUF			u.m3.m3p2
 #define	OFFSET		u.m3.m3i2
 #define	WHENCE		u.m3.m3i3
 
-#define	PID		u.m3.m3i2
+#define	PID			u.m3.m3i2
 #define	RETVAL		u.m3.m3i1
 #define	STATUS		u.m3.m3i1
-
-
-
-
-
-
-
-
 
 #define	DIOCTL_GET_GEO	1
 
@@ -262,7 +260,6 @@ enum msgtype {
 /* device numbers of hard disk */
 #define	MINOR_hd1a		0x10
 #define	MINOR_hd2a		(MINOR_hd1a+NR_SUB_PER_PART)
-#define	MINOR_hd2c		(MINOR_hd1a+NR_SUB_PER_PART+2)
 
 #define	ROOT_DEV		MAKE_DEV(DEV_HD, MINOR_BOOT)
 
@@ -290,8 +287,22 @@ enum msgtype {
 #define	is_special(m)	((((m) & I_TYPE_MASK) == I_BLOCK_SPECIAL) ||	\
 			 (((m) & I_TYPE_MASK) == I_CHAR_SPECIAL))
 
-#define	NR_DEFAULT_FILE_SECTS	2048 /* 2048 * 512 = 1MB */
+#define	NR_DEFAULT_FILE_SECTS	512 /* 2048 * 512 = 1MB */
 
 
 
 #endif /* _ORANGES_CONST_H_ */
+
+/**
+ * @enum logtype
+ */
+enum logtype{
+	MMLOG = 1,
+	FSLOG,
+	SYSLOG,
+	HDLOG
+};
+
+#define MAX_LOG_BUF 256
+#define CHECK_LOG_BUF 220
+

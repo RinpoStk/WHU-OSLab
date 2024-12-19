@@ -6,3 +6,5 @@ a.img
 kernel.dbg
 *.bin
 *.o
+*.a
+*.tar
