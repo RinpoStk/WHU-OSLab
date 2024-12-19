@@ -61,12 +61,11 @@ PUBLIC void task_hd()
 	while (1) {
 		send_recv(RECEIVE, ANY, &msg);
 
-		// struct proc * p = proc_table;
+		struct proc * p = proc_table;
 		int src = msg.source;
-		// int src_1 = src;
-		// int msgtype = msg.type;
-		// char * pname = p[src_1].name;
-		// int drive = DRV_OF_DEV(msg.DEVICE);
+		int msgtype = msg.type;
+		char * pname = p[src].name;
+		int drive = DRV_OF_DEV(msg.DEVICE);
 
 #ifdef ENABLE_FILE_LOG
 		char * msg_name[128];
@@ -78,20 +77,20 @@ PUBLIC void task_hd()
 		// printl("1111111\n");
 		switch (msg.type) {
 		case DEV_OPEN:
-			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src_1, msg_name[msgtype], drive);
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
 			break;
 
 		case DEV_CLOSE:
-			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src_1, msg_name[msgtype], drive);
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
 			break;
 
 		case DEV_READ:
 		case DEV_WRITE:
-			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src_1, msg_name[msgtype], drive);
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
 			break;
 
 		case DEV_IOCTL:
-			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src_1, msg_name[msgtype], drive);
+			syslog_file(HDLOG, "[PORC %s, PID %d, %s DRIVE %d];\n", pname, src, msg_name[msgtype], drive);
 			break;
 
 		default:

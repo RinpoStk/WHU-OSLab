@@ -43,4 +43,4 @@
 #define	NR_SECTS_FOR_LOG		NR_DEFAULT_FILE_SECTS
 
 // file log
-// #define ENABLE_FILE_LOG
+#define ENABLE_FILE_LOG

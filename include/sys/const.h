@@ -137,7 +137,8 @@
 #define TASK_HD		2
 #define TASK_FS		3
 #define TASK_MM		4
-#define INIT		5
+#define TASK_LOG	5
+#define INIT		6
 #define ANY		(NR_TASKS + NR_PROCS + 10)
 #define NO_TASK		(NR_TASKS + NR_PROCS + 20)
 
@@ -187,8 +188,7 @@ enum msgtype {
 	KILL,
 
 	// GET_PNAME,
-	//
-	// FS_LOG,					// FS_LOG for fs send msg to mm
+	FS_LOG,					// FS_LOG for fs send msg to mm
 
 	/* message type for drivers */
 	DEV_OPEN = 1001,

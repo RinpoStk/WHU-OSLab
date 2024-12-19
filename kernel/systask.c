@@ -40,10 +40,9 @@ PUBLIC void task_sys()
 		send_recv(RECEIVE, ANY, &msg);
 		int src = msg.source;
 
-		// int msgtype = msg.type;
-		// int src_1 	= src;
-		// struct porc * p = proc_table;
-		// char * pname = proc_table[src_1].name;
+		int msgtype = msg.type;
+		struct porc * p = proc_table;
+		char * pname = proc_table[src].name;
 
 		// printl("in sys %s\n", pname);
 
@@ -55,13 +54,13 @@ PUBLIC void task_sys()
 
 		switch (msg.type) {
 		case GET_TICKS:
-			// syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[msgtype]);
+			// syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
 			break;
 		case GET_PID:
-			syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[msgtype]);
+			syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
 			break;
 		case GET_RTC_TIME:
-			syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src_1, msg_name[msgtype]);
+			syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
 			break;
 		default:
 			// panic("unknown msg type");
@@ -98,17 +97,17 @@ PUBLIC void task_sys()
 		// switch (msgtype) {
 		// case GET_TICKS:
 		//
-		// 	// syslog_file("[PORC %s, PID %d, FORK];\n", pname, src_1);
+		// 	// syslog_file("[PORC %s, PID %d, FORK];\n", pname, src);
 		// 	// printl("abc ");
 		// 	break;
 		// case GET_PID:
-		// 	// syslog_file("[PORC %s, PID %d, PID];\n", pname, src_1);
+		// 	// syslog_file("[PORC %s, PID %d, PID];\n", pname, src);
 		// 	break;
 		// case GET_RTC_TIME:
-		// 	// syslog_file("[PORC %s, PID %d, EXEC];\n", pname, src_1);
+		// 	// syslog_file("[PORC %s, PID %d, EXEC];\n", pname, src);
 		// 	break;
 		// default:
-		// 	//syslog_file("[PORC %s, PID %d, DO UNKNOW];\n", pname, src_1);
+		// 	//syslog_file("[PORC %s, PID %d, DO UNKNOW];\n", pname, src);
 		// 	break;
 		// }
 #endif

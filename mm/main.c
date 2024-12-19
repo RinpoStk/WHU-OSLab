@@ -44,8 +44,8 @@ PUBLIC void task_mm()
 		int src = mm_msg.source;
 		int reply = 1;
 
-		// struct proc * p = proc_table;
-		// char * pname = p[src].name;
+		struct proc * p = proc_table;
+		char * pname = p[src].name;
 
 		int msgtype = mm_msg.type;
 
@@ -63,9 +63,9 @@ PUBLIC void task_mm()
 		case WAIT:
 			syslog_file(MMLOG, "[PORC %s, PID %d, WAITIG];\n", pname, src);
 			break;
-		case GET_PNAME:
-			syslog_file(MMLOG, "[PORC %s, PID %d, GETNAME];\n", pname, src);
-			break;
+		// case GET_PNAME:
+			// syslog_file(MMLOG, "[PORC %s, PID %d, GETNAME];\n", pname, src);
+			// break;
 		// case FS_LOG:
 		// 	char * porcname = p[mm_msg.PID].name;
 		// 	printl("in mmmmmmmmm PID %d PNAME %s",mm_msg.PID ,porcname);
@@ -104,8 +104,8 @@ PUBLIC void task_mm()
 		// case GET_PNAME:
 		// 	mm_msg.RETVAL = do_getpname(src);
 		// break;
-		// case FS_LOG:
-		// 	break;
+		case FS_LOG:
+			break;
 		default:
 			dump_msg("MM::unknown msg", &mm_msg);
 			assert(0);

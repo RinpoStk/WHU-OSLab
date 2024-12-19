@@ -54,7 +54,7 @@ CSTART	= $(CSRCDIR)/start.asm
 CSTARTOBJ= $(CSRCDIR)/start.o
 
 # All Phony Targets
-.PHONY : everything final image clean realclean disasm all buildimg
+.PHONY : everything final image clean realclean disasm all buildimg ccommand
 
 # Default starting position
 nop :
@@ -66,9 +66,9 @@ split : everything
 	objcopy --only-keep-debug $(ORANGESKERNEL) $(SYMKERNEL)
 	strip --strip-debug $(ORANGESKERNEL)
 
-all : realclean split command
+all : realclean split ccommand
 
-image : realclean split command buildimg clean
+image : realclean split ccommand buildimg clean
 
 clean :
 	rm -f $(OBJS) $(CSTARTOBJ) $(COBJS) $(CBIN)
@@ -80,6 +80,7 @@ disasm :
 	$(DASM) $(DASMFLAGS) $(ORANGESKERNEL) > $(DASMOUTPUT)
 
 buildimg :
+	dd if=command/inst.tar of=$(HD) seek=$(shell echo "obase=10;ibase=16;(`egrep -e '^ROOT_BASE' boot/include/load.inc | sed -e 's/.*0x//g'`+`egrep -e '#define[[:space:]]*INSTALL_START_SECT' include/sys/config.h | sed -e 's/.*0x//g'`)*200" | bc) bs=1 count=$(shell ls -l command/inst.tar | awk -F " " '{print $$5}') conv=notrunc
 	dd if=boot/boot.bin of=$(FD) bs=512 count=1 conv=notrunc
 	dd if=boot/hdboot.bin of=$(HD) bs=1 count=446 conv=notrunc
 	dd if=boot/hdboot.bin of=$(HD) seek=510 skip=510 bs=1 count=2 conv=notrunc
@@ -88,9 +89,8 @@ buildimg :
 	sudo cp -fv kernel.bin /mnt/floppy
 	sudo umount /mnt/floppy
 
-command :
+ccommand :
 	tar vcf command/inst.tar -C command/ $(notdir $(CBIN))
-	dd if=command/inst.tar of=$(HD) seek=$(shell echo "obase=10;ibase=16;(`egrep -e '^ROOT_BASE' boot/include/load.inc | sed -e 's/.*0x//g'`+`egrep -e '#define[[:space:]]*INSTALL_START_SECT' include/sys/config.h | sed -e 's/.*0x//g'`)*200" | bc) bs=1 count=$(shell ls -l command/inst.tar | awk -F " " '{print $$5}') conv=notrunc
 
 boot/boot.bin: boot/boot.asm boot/include/load.inc boot/include/fat12hdr.inc
 	$(ASM) $(ASMBFLAGS) -o $@ $<
