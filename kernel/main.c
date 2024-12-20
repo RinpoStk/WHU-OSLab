@@ -329,17 +329,18 @@ void shabby_shell(const char *tty_name) {
  * The hen.
  *
  *****************************************************************************/
-void Init() {
-    int fd_stdin = open("/dev_tty0", O_RDWR);
-    assert(fd_stdin == 0);
-    int fd_stdout = open("/dev_tty0", O_RDWR);
-    assert(fd_stdout == 1);
+void Init()
+{
+	int fd_stdin  = open("/dev_tty0", O_RDWR);
+	assert(fd_stdin  == 0);
+	int fd_stdout = open("/dev_tty0", O_RDWR);
+	assert(fd_stdout == 1);
 
     printf("Init() is running ...\n");
 
-    /* extract `cmd.tar' */
-    untar("/cmd.tar");
-
+	/* extract `cmd.tar' */
+	untar("/cmd.tar");
+			
 
     char *tty_list[] = {"/dev_tty1", "/dev_tty2"};
 
@@ -374,39 +375,14 @@ void Init() {
                                TestA
  *======================================================================*/
 void TestA() {
-    // int fd_stdin  = open("/dev_tty0", O_RDWR);
-    // assert(fd_stdin  == 0);
-    // int fd_stdout = open("/dev_tty0", O_RDWR);
-    // assert(fd_stdout == 1);
-    // // ProcInfo proc_info_array[64];
-    // // int proc_count = get_proc_info(proc_info_array, 64);
     // char *files;
-    // files = search_dir("/");
-    // printf("%s",files);
-    while (1) {
-        // milli_delay(10000);
-        //
-        // if (mm_buffull_flag) {
-        // 	filelog(MMLOG, mm_log_file);
-        // }
-        //
-        // if (fs_buffull_flag) {
-        // 	// handle fs_log_bufpos overflow
-        // 	filelog(FSLOG, fs_log_file);
-        // }
-        //
-        // if (sys_buffull_flag) {
-        // 	// handle sys_log_bufpos overflow
-        // 	filelog(SYSLOG, sys_log_file);
-        // }
-        //
-        // if (hd_buffull_flag) {
-        // 	// handle hd_log_bufpos overflow
-        // 	filelog(HDLOG, hd_log_file);
-        // }
-    }
+	// files = search_dir("/");
+	// printf("%s",files);
+	while (1) {
+		// milli_delay(10000);
 
-    // for(;;){
+	}
+	// for(;;){
     // 	printf("PID\tNAME\n");
     // 	for (int i = 0; i < proc_count; i++) {
     //     	printf("%d\t%s\n", proc_info_array[i].pid, proc_info_array[i].name);
@@ -417,15 +393,17 @@ void TestA() {
 /*======================================================================*
                                TestB
  *======================================================================*/
-void TestB() {
-    for (;;);
+void TestB()
+{
+	for(;;);
 }
 
 /*======================================================================*
                                TestB
  *======================================================================*/
-void TestC() {
-    for (;;);
+void TestC()
+{
+	for(;;);
 }
 
 /*****************************************************************************

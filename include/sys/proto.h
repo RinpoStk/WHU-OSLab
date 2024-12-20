@@ -144,6 +144,8 @@ PUBLIC void spin(char * func_name);
 // log
 PUBLIC void task_log(void);
 void init_sys_file(void);
+PUBLIC int syslog_file(int log_buf_flag, const char*fmt, ...);
+PUBLIC int filelog(int log_buf_flag, char * file_name);
 
 /* 以下是系统调用相关 */
 

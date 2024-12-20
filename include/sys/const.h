@@ -189,6 +189,7 @@ enum msgtype {
 
 	// GET_PNAME,
 	FS_LOG,					// FS_LOG for fs send msg to mm
+	PUT_CUSTOMLOG,
 
 	/* message type for drivers */
 	DEV_OPEN = 1001,
@@ -300,7 +301,8 @@ enum logtype{
 	MMLOG = 1,
 	FSLOG,
 	SYSLOG,
-	HDLOG
+	HDLOG,
+	CUSTOMLOG
 };
 
 #define MAX_LOG_BUF 256

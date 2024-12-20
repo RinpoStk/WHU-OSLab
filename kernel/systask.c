@@ -68,8 +68,6 @@ PUBLIC void task_sys()
 		}
 #endif
 
-
-
 		switch (msg.type) {
 		case GET_TICKS:
 			msg.RETVAL = ticks;
@@ -86,6 +84,14 @@ PUBLIC void task_sys()
 			phys_copy(va2la(src, msg.BUF),
 				  va2la(TASK_SYS, &t),
 				  sizeof(t));
+			send_recv(SEND, src, &msg);
+			break;
+		case PUT_CUSTOMLOG:
+			msg.type = SYSCALL_RET;
+			phys_copy((void*)va2la(TASK_SYS, custom_buf),
+					  (void*)va2la(src, msg.BUF),
+					  strlen(va2la(src, msg.BUF)));
+			syslog_file(CUSTOMLOG, custom_buf);
 			send_recv(SEND, src, &msg);
 			break;
 		default:

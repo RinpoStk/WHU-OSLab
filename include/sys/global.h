@@ -80,7 +80,6 @@ EXTERN  u8      szPageFreeErr[20];
 EXTERN  u8      szPageAllocErr[20];
 
 // log
-
 EXTERN	int				log_gate;
 
 /* for log buf */
@@ -90,17 +89,25 @@ extern bool mm_buffull_flag;
 extern bool fs_buffull_flag;
 extern bool sys_buffull_flag;
 extern bool hd_buffull_flag;
+extern bool custom_buffull_flag;
 
 extern int mm_log_bufpos;
 extern int fs_log_bufpos;
 extern int sys_log_bufpos;
 extern int hd_log_bufpos;
+extern int custom_log_bufpos;
+
 extern char mm_log_buf[];
 extern char fs_log_buf[];
 extern char sys_log_buf[];
 extern char hd_log_buf[];
+extern char custom_log_buf[];
 
 extern char * mm_log_file;
 extern char * fs_log_file;
 extern char * sys_log_file;
 extern char * hd_log_file;
+extern char * custom_log_file;
+
+extern	char *	custom_buf;
+extern	const int	CUSTOMBUF_SIZE;

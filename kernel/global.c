@@ -107,10 +107,14 @@ PUBLIC	const int	LOGDISKBUF_SIZE	= 0x100000;
 
 
 /* for log buf */
+PUBLIC	char *	custom_buf	= (char*)0x1000000;
+PUBLIC	const int	CUSTOMBUF_SIZE	= 0x100000;
+
 PUBLIC bool mm_buffull_flag = false;
 PUBLIC bool fs_buffull_flag = false;
 PUBLIC bool sys_buffull_flag = false;
 PUBLIC bool hd_buffull_flag = false;
+PUBLIC bool custom_buffull_flag = false;
 
 // PUBLIC bool a = true;
 
@@ -118,12 +122,15 @@ PUBLIC int mm_log_bufpos = 0;
 PUBLIC int fs_log_bufpos = 0;
 PUBLIC int sys_log_bufpos = 0;
 PUBLIC int hd_log_bufpos = 0;
+PUBLIC int custom_log_bufpos = 0;
 PUBLIC char mm_log_buf	[MAX_LOG_BUF];
 PUBLIC char fs_log_buf	[MAX_LOG_BUF];
 PUBLIC char sys_log_buf	[MAX_LOG_BUF];
 PUBLIC char hd_log_buf	[MAX_LOG_BUF];
+PUBLIC char custom_log_buf [MAX_LOG_BUF];
 
 PUBLIC char * mm_log_file = "syslog_mm";
 PUBLIC char * fs_log_file = "syslog_fs";
 PUBLIC char * sys_log_file = "syslog_sys";
 PUBLIC char * hd_log_file = "syslog_hd";
+PUBLIC char * custom_log_file = "syslog_custom";

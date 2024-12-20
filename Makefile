@@ -90,7 +90,7 @@ buildimg :
 	sudo umount /mnt/floppy
 
 ccommand :
-	tar vcf command/inst.tar -C command/ $(notdir $(CBIN))
+	tar -cvf command/inst.tar -C command/ $(notdir $(CBIN))
 
 boot/boot.bin: boot/boot.asm boot/include/load.inc boot/include/fat12hdr.inc
 	$(ASM) $(ASMBFLAGS) -o $@ $<
