@@ -24,13 +24,13 @@ EXTERN	u32	k_reenter;
 EXTERN	int	current_console;
 
 EXTERN	int	key_pressed; /**
-			      * used for clock_handler
-			      * to wake up TASK_TTY when
-			      * a key is pressed
-			      */
+                  * used for clock_handler
+                  * to wake up TASK_TTY when
+                  * a key is pressed
+                  */
 
 EXTERN	struct tss	tss;
-EXTERN	struct proc*	p_proc_ready;
+EXTERN	struct proc* p_proc_ready;
 
 extern	char		task_stack[];
 extern	struct proc	proc_table[];
@@ -47,7 +47,7 @@ extern  int idx;
 
 /* MM */
 EXTERN	MESSAGE			mm_msg;
-extern	u8 *			mmbuf;
+extern	u8* mmbuf;
 extern	const int		MMBUF_SIZE;
 EXTERN	int			memory_size;
 
@@ -55,11 +55,11 @@ EXTERN	int			memory_size;
 EXTERN	struct file_desc	f_desc_table[NR_FILE_DESC];
 EXTERN	struct inode		inode_table[NR_INODE];
 EXTERN	struct super_block	super_block[NR_SUPER_BLOCK];
-extern	u8 *			fsbuf;
+extern	u8* fsbuf;
 extern	const int		FSBUF_SIZE;
 EXTERN	MESSAGE			fs_msg;
-EXTERN	struct proc *		pcaller;
-EXTERN	struct inode *		root_inode;
+EXTERN	struct proc* pcaller;
+EXTERN	struct inode* root_inode;
 extern	struct dev_drv_map	dd_map[];
 
 // RANDOM
@@ -67,9 +67,9 @@ EXTERN	int k_seed;
 EXTERN	int rand_times;
 
 /* for test only */
-extern	char *			logbuf;
+extern	char* logbuf;
 extern	const int		LOGBUF_SIZE;
-extern	char *			logdiskbuf;
+extern	char* logdiskbuf;
 extern	const int		LOGDISKBUF_SIZE;
 
 /*for memory management*/
@@ -103,11 +103,15 @@ extern char sys_log_buf[];
 extern char hd_log_buf[];
 extern char custom_log_buf[];
 
-extern char * mm_log_file;
-extern char * fs_log_file;
-extern char * sys_log_file;
-extern char * hd_log_file;
-extern char * custom_log_file;
+extern char* mm_log_file;
+extern char* fs_log_file;
+extern char* sys_log_file;
+extern char* hd_log_file;
+extern char* custom_log_file;
 
-extern	char *	custom_buf;
+extern	char* custom_buf;
 extern	const int	CUSTOMBUF_SIZE;
+
+extern unsigned int sysfile_cnt;
+extern char file_crypt_key[MAX_FILE_CRYPT_KEYLEN];
+extern unsigned int  file_crypt_keylen;

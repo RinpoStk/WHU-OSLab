@@ -1,9 +1,10 @@
 #include "stdio.h"
 #include"string.h"
 #include "../include/sys/const.h"
+#include "../include/sys/fs.h"
 #include "type.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     int print_size = 0;
     int print_inode = 0;
 
@@ -11,7 +12,8 @@ int main(int argc, char *argv[]) {
     for (int arg = 1; arg < argc; arg++) {
         if (strcmp(argv[arg], "-s") == 0) {
             print_size = 1;
-        } else if (strcmp(argv[arg], "-i") == 0) {
+        }
+        else if (strcmp(argv[arg], "-i") == 0) {
             print_inode = 1;
         }
     }
@@ -22,10 +24,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    struct dir_entry {
-        int inode_nr;
-        char name[12];
-    } dir_entries[64];
+    struct dir_entry dir_entries[64];
 
     int n = read(fd, dir_entries, sizeof(dir_entries));
     if (n == -1) {
@@ -37,11 +36,14 @@ int main(int argc, char *argv[]) {
     // 打印标题
     if (print_inode && print_size) {
         printf("Name\t\tSize(byte)\tInode\n");
-    } else if (print_inode) {
+    }
+    else if (print_inode) {
         printf("Name\t\tInode\n");
-    } else if (print_size) {
+    }
+    else if (print_size) {
         printf("Name\t\tSize(byte)\n");
-    } else {
+    }
+    else {
         printf("Name\n");
     }
 
@@ -52,14 +54,18 @@ int main(int argc, char *argv[]) {
             if (stat(dir_entries[i].name, &file_stat) == 0) {
                 if (print_inode && print_size) {
                     printf("%s\t\t%d\t\t%d\n", dir_entries[i].name, file_stat.st_size, file_stat.st_ino);
-                } else if (print_inode) {
+                }
+                else if (print_inode) {
                     printf("%s\t\t%d\n", dir_entries[i].name, file_stat.st_ino);
-                } else if (print_size) {
+                }
+                else if (print_size) {
                     printf("%s\t\t%d\n", dir_entries[i].name, file_stat.st_size);
-                } else {
+                }
+                else {
                     printf("%s\n", dir_entries[i].name);
                 }
-            } else {
+            }
+            else {
                 printf("%s\t\tError\n", dir_entries[i].name);
             }
         }

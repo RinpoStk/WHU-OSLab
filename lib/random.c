@@ -21,7 +21,10 @@ PUBLIC void srand(int seed) {
     if (seed == 0) {
         __seed = 1;
     }
-    __seed = seed;
+    else{
+        __seed = seed;
+    }
+
 }
 
 PUBLIC int rand(void) {
