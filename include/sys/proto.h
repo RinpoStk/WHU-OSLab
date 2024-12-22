@@ -17,6 +17,8 @@ PUBLIC void	enable_int();
 PUBLIC void	port_read(u16 port, void* buf, int n);
 PUBLIC void	port_write(u16 port, void* buf, int n);
 PUBLIC void	glitter(int row, int col);
+PUBLIC u32  alloc_pages();
+
 
 /* string.asm */
 PUBLIC char*	strcpy(char* dst, const char* src);
@@ -33,6 +35,8 @@ PUBLIC int	get_kernel_map(unsigned int * b, unsigned int * l);
 PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
 PUBLIC char *	itoa(char * str, int num);
+PUBLIC int	random();
+PUBLIC int check_passwd(char* passwd, unsigned int passwdlen);
 
 /* kernel.asm */
 PUBLIC void restart();
@@ -102,6 +106,10 @@ PUBLIC int		do_disklog();
 PUBLIC int		disklog(char * logstr); /* for debug */
 PUBLIC void		dump_fd_graph(const char * fmt, ...);
 
+// fs/checksum
+PUBLIC void put_checksum();
+PUBLIC void command_check();
+
 /* mm/main.c */
 PUBLIC void		task_mm();
 PUBLIC int		alloc_mem(int pid, int memsize);
@@ -112,11 +120,11 @@ PUBLIC int		do_fork();
 PUBLIC void		do_exit(int status);
 PUBLIC void		do_wait();
 PUBLIC int 		do_kill(int pid,int status);
-PUBLIC void 	do_waitpid();
 // PUBLIC void		do_kill(int pid, int status);
 
 /* mm/exec.c */
 PUBLIC int		do_exec();
+// PUBLIC int		do_getpname(int pid);
 
 /* console.c */
 PUBLIC void out_char(CONSOLE* p_con, char ch);
@@ -137,6 +145,20 @@ PUBLIC void	inform_int(int task_nr);
 
 /* lib/misc.c */
 PUBLIC void spin(char * func_name);
+
+// log
+PUBLIC void task_log(void);
+void init_sys_file(void);
+PUBLIC int syslog_file(int log_buf_flag, const char*fmt, ...);
+PUBLIC int filelog(int log_buf_flag, char * file_name);
+
+// md5 checksum
+PUBLIC void checksum_md5(void *input, u32 length, char *result);
+PUBLIC void checksum_md5_file(int fd, char *result);
+
+// sec
+PUBLIC int put_canary();
+PUBLIC void canary_check(int value);
 
 /* 以下是系统调用相关 */
 

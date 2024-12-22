@@ -216,10 +216,7 @@ PUBLIC int do_kill(int pid, int status){
         printl("do_kill: Invalid PID %d\n", pid);
         return -1;
     }
-	if(pid>NR_TASKS+NR_NATIVE_PROCS){
-		printl("cannot kill native procs");
-		return -1;
-	}
+
     struct proc *p = &proc_table[pid];
     
     if(p->p_flags == FREE_SLOT){
@@ -347,34 +344,4 @@ PUBLIC void do_wait()
 		msg.PID = NO_TASK;
 		send_recv(SEND, pid, &msg);
 	}
-}
-
-PUBLIC void do_waitpid()
-{
-    int pid = mm_msg.PID; 
-    int src = mm_msg.source; 
-
-    struct proc *p;
-    int found = 0;
-
-    for (int i = 0; i < NR_TASKS + NR_PROCS; i++) {
-        p = &proc_table[i];
-        if (p->p_parent == src && proc2pid(p) == pid) {
-            found = 1;
-            break;
-        }
-    }
-
-    if (!found) {
-        mm_msg.RETVAL = -1;
-        return;
-    }
-
-    if (p->p_flags & HANGING) {
-        cleanup(p);
-        mm_msg.RETVAL = pid;
-    }
-    else {
-        proc_table[src].p_flags |= WAITING;
-    }
 }

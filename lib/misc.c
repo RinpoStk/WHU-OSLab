@@ -248,6 +248,7 @@ PUBLIC int atoi(const char *str) {
 }
 
 PUBLIC char *strchr(const char *str, int c) {
+	// char *p = va2la(proc2pid(p_proc_ready), (void *)str);
     while (*str) {
         if (*str == (char)c) {
             return (char *)str;

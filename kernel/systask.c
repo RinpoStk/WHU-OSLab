@@ -19,6 +19,7 @@
 #include "global.h"
 #include "keyboard.h"
 #include "proto.h"
+#include "config.h"
 
 PRIVATE int read_register(char reg_addr);
 PRIVATE u32 get_rtc_time(struct time *t);
@@ -39,6 +40,34 @@ PUBLIC void task_sys()
 		send_recv(RECEIVE, ANY, &msg);
 		int src = msg.source;
 
+		int msgtype = msg.type;
+		struct porc * p = proc_table;
+		char * pname = proc_table[src].name;
+
+		// printl("in sys %s\n", pname);
+
+#ifdef ENABLE_FILE_LOG
+		char * msg_name[40];
+		msg_name[GET_TICKS]   = "GET_TICKS";
+		msg_name[GET_PID]   = "GET_PID";
+		msg_name[GET_RTC_TIME]  = "GET_RTC_TIME";
+
+		switch (msg.type) {
+		case GET_TICKS:
+			// syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
+			break;
+		case GET_PID:
+			syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
+			break;
+		case GET_RTC_TIME:
+			syslog_file(SYSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
+			break;
+		default:
+			// panic("unknown msg type");
+			break;
+		}
+#endif
+
 		switch (msg.type) {
 		case GET_TICKS:
 			msg.RETVAL = ticks;
@@ -57,10 +86,38 @@ PUBLIC void task_sys()
 				  sizeof(t));
 			send_recv(SEND, src, &msg);
 			break;
+		case PUT_CUSTOMLOG:
+			msg.type = SYSCALL_RET;
+			phys_copy((void*)va2la(TASK_SYS, custom_buf),
+					  (void*)va2la(src, msg.BUF),
+					  strlen(va2la(src, msg.BUF)));
+			syslog_file(CUSTOMLOG, custom_buf);
+			send_recv(SEND, src, &msg);
+			break;
 		default:
 			panic("unknown msg type");
 			break;
 		}
+
+#ifndef ENABLE_FILE_LOG
+		// switch (msgtype) {
+		// case GET_TICKS:
+		//
+		// 	// syslog_file("[PORC %s, PID %d, FORK];\n", pname, src);
+		// 	// printl("abc ");
+		// 	break;
+		// case GET_PID:
+		// 	// syslog_file("[PORC %s, PID %d, PID];\n", pname, src);
+		// 	break;
+		// case GET_RTC_TIME:
+		// 	// syslog_file("[PORC %s, PID %d, EXEC];\n", pname, src);
+		// 	break;
+		// default:
+		// 	//syslog_file("[PORC %s, PID %d, DO UNKNOW];\n", pname, src);
+		// 	break;
+		// }
+#endif
+
 	}
 }
 

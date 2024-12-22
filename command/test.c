@@ -8,5 +8,4 @@ int main(int argc, char * argv[]){
     fd = open("a.txt", O_RDWR);
     write(fd, "Hello, world1!\n", 14);
     close(fd);
-
 }

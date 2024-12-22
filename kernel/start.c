@@ -42,7 +42,22 @@ PUBLIC void cstart()
 	*p_idt_limit = IDT_SIZE * sizeof(struct gate) - 1;
 	*p_idt_base  = (u32)&idt;
 
-	init_prot();
+    PageDirBase = 0x100000;
+    PageTblBase = 0x101000;
+    dwPDENum = 8;
+    memcpy(szPageAllocErr, "Page Alloc Error!\n\0", 18);
+    memcpy(szPageFreeErr, "Page Free Error!\n\0", 17);
+    // free_pages(4, 0x812000);
+    // free_pages(10, 0xc22000);
+
+    // u32 tmp = alloc_pages(8);
+    // disp_str("alloc pages at: 0x");
+    // disp_int(tmp);
+    // disp_str("\n");
+    // while (1){}
+
+
+    init_prot();
 
 	disp_str("-----\"cstart\" finished-----\n");
 }

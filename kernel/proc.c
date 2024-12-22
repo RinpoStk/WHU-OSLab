@@ -30,26 +30,86 @@ PRIVATE int  deadlock(int src, int dest);
  * <Ring 0> Choose one proc to run.
  * 
  *****************************************************************************/
+void queue_pop(PROC_QUEUE* p_queue, struct proc* p, int i, int if_forced)
+{
+    if (i == NR_QUEUES - 1 || if_forced)
+    {
+        p_queue = MLFQ + NR_QUEUES - 1;
+        if (!if_forced)
+            p_queue->head = (p_queue->head + 1) % p_queue->queue_len;
+        p_queue->queue[p_queue->tail] = p;
+        p_queue->tail = (p_queue->tail + 1) % p_queue->queue_len;
+        cur_time_slice[proc2pid(p)] = p_queue->time_slice;
+    }
+    else
+    {
+        PROC_QUEUE* next_queue = p_queue + 1;
+        next_queue->queue[next_queue->tail] = p;
+        next_queue->tail = (next_queue->tail + 1) % p_queue->queue_len;
+        p_queue->head = (p_queue->head + 1) % p_queue->queue_len;
+        cur_time_slice[proc2pid(p)] = next_queue->time_slice;
+    }
+}
+
+int flag[20] = { 0 };
 PUBLIC void schedule()
 {
-	struct proc*	p;
-	int		greatest_ticks = 0;
+    PROC_QUEUE* p_queue = MLFQ;
+    struct proc* p = 0;
+    for (int i = 0;i < NR_QUEUES;i++)
+    {
+        if (p_queue->tail != p_queue->head)
+        {
+            for (int j = p_queue->head;j != p_queue->tail;j = (j + 1) % p_queue->queue_len)
+            {
+                p = p_queue->queue[j];
+                // if (flag[7])
+                //     printl("%d %d; ", proc2pid(p), p->p_flags);
+                if (p->p_flags == 0)
+                    break;
+                // if (flag && proc2pid(p) == 8)
+                //     assert(21 == 0);
+                queue_pop(p_queue, p, i, 0);
+            }
+            if (p->p_flags != 0)
+            {
+                p_queue++;
+                continue;
+            }
+            p_proc_ready = p;
+            p_proc_ready->ticks--;
+            cur_time_slice[proc2pid(p)]--;
+            // if (flag[6])
+            //     // assert(1 == 0);
+            //     printl("%d ", proc2pid(p));
+            if (proc2pid(p) >= 7 && proc2pid(p) <= 8)
+                printl("%d ", proc2pid(p));
+            if (p->ticks == 0)
+            {
+                p_queue->head = (p_queue->head + 1) % p_queue->queue_len;
+                if (proc2pid(p) < 7 || proc2pid(p) > 8)
+                {
+                    p->ticks = p->priority;
+                    queue_pop(MLFQ + NR_QUEUES - 1, p, NR_QUEUES - 1, 1);
+                    // continue;
+                }
+                if (proc2pid(p) >= 7 && proc2pid(p) <= 8)
+                {
+                    flag[proc2pid(p)] = 1;
+                    // p->p_flags = HANGING;
+                }
 
-	while (!greatest_ticks) {
-		for (p = &FIRST_PROC; p <= &LAST_PROC; p++) {
-			if (p->p_flags == 0) {
-				if (p->ticks > greatest_ticks) {
-					greatest_ticks = p->ticks;
-					p_proc_ready = p;
-				}
-			}
-		}
 
-		if (!greatest_ticks)
-			for (p = &FIRST_PROC; p <= &LAST_PROC; p++)
-				if (p->p_flags == 0)
-					p->ticks = p->priority;
-	}
+            }
+            else if (cur_time_slice[proc2pid(p)] == 0)
+            {
+                queue_pop(p_queue, p, i, 0);
+            }
+
+            break;
+        }
+        p_queue++;
+    }
 }
 
 /*****************************************************************************

@@ -16,6 +16,6 @@ int main(int argc,char *argv[]){
             printf("%d\t%s\n", i, proc_info_array[i].name);
         }
     }
-    printf("Total %d processes.\n", proc_count);
+    // printf("Total %d processes.\n", proc_count);
     return 0;
 }

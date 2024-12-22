@@ -40,15 +40,3 @@ PUBLIC int wait(int * status)
 
 	return (msg.PID == NO_TASK ? -1 : msg.PID);
 }
-
-PUBLIC int waitpid(int pid, int *status, struct proc * p_proc)
-{
-    MESSAGE msg;
-    msg.type   = WAITPID;
-    msg.PID    = pid;
-    msg.BUF    = (void*)status;
-
-    send_recv(BOTH, TASK_MM, &msg);
-
-    return msg.RETVAL; 
-}

@@ -76,15 +76,15 @@ PUBLIC int execv(const char *path, char * argv[])
 		*q++ = &arg_stack[stack_len];
 
 		assert(stack_len + strlen(*p) + 1 < PROC_ORIGIN_STACK);
-		strcpy(&arg_stack[stack_len], *p);
-		stack_len += strlen(*p);
+		strcpy(&arg_stack[stack_len], *p);			// arg_stack:   1	2	3	4	5	6
+		stack_len += strlen(*p);					// 				l	o	g		s	t
 		arg_stack[stack_len] = 0;
 		stack_len++;
 	}
 
 	MESSAGE msg;
 	msg.type	= EXEC;
-	msg.PATHNAME	= (void*)path;
+	msg.PATHNAME	= (void*)path;			// pathname is the name of cmd file
 	msg.NAME_LEN	= strlen(path);
 	msg.BUF		= (void*)arg_stack;
 	msg.BUF_LEN	= stack_len;
