@@ -75,6 +75,9 @@ PUBLIC int send_recv(int function, int src_dest, MESSAGE* msg)
  *          n bytes of s1 is found, respectively, to be less than, to match,
  *          or  be greater than the first n bytes of s2.
  *****************************************************************************/
+
+#include "syscall.h"
+
 PUBLIC int memcmp(const void * s1, const void *s2, int n)
 {
 	if ((s1 == 0) || (s2 == 0)) { /* for robustness */
@@ -246,3 +249,8 @@ PUBLIC int atoi(const char *str) {
 	}
 	return sign * result;
 }
+
+PUBLIC void user_syscall(MESSAGE msg) {
+	send_recv(BOTH, TASK_FS, &msg);
+}
+

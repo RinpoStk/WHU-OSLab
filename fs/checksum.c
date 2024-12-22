@@ -44,10 +44,10 @@ PUBLIC void command_check() {
     int fd = fs_msg.FD;
     u8 * buf = fs_msg.BUF;
     fs_msg.FLAGS = 1;
-    // for (int i = 0; i < SYS_CHECKSUM_LEN; i++) {
-    //     if (pcaller->filp[fd]->fd_inode->i_checksum[i] != buf[i]) {
-    //         fs_msg.FLAGS = 1;
-    //         break;
-    //     }
-    // }
+    for (int i = 0; i < SYS_CHECKSUM_LEN; i++) {
+        if (pcaller->filp[fd]->fd_inode->i_checksum[i] != buf[i]) {
+            fs_msg.FLAGS = 0;
+            break;
+        }
+    }
 }
