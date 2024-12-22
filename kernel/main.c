@@ -282,64 +282,90 @@ void untar(const char *filename) {
  *
  * @param tty_name  TTY file name.
  *****************************************************************************/
-void shabby_shell(const char *tty_name) {
-    int fd_stdin = open(tty_name, O_RDWR);
-    assert(fd_stdin == 0);
+
+int is_elf_file(const char *path) {
+    int fd = open(path, O_RDWR);
+    if (fd == -1) {
+        return 0;
+    }
+
+    char magic[4];
+    read(fd, magic, 4);
+    close(fd);
+
+    // 检查文件头是否为ELF文件头
+    if (magic[0] == 0x7f && magic[1] == 'E' && magic[2] == 'L' && magic[3] == 'F') {
+        return 1;
+    }
+
+    return 0;
+}
+
+void shabby_shell(const char * tty_name)
+{
+    int fd_stdin  = open(tty_name, O_RDWR);
+    assert(fd_stdin  == 0);
     int fd_stdout = open(tty_name, O_RDWR);
     assert(fd_stdout == 1);
 
-    //check password
-    char rdbuf[128];
+    char rdbuf[MAX_COMMAND_LENGTH];
 
     while (1) {
         write(1, "$ ", 2);
-        int r = read(0, rdbuf, 70);
+        printl("shabby_shell: ");
+        int r = read(0, rdbuf, MAX_COMMAND_LENGTH - 1);
         rdbuf[r] = 0;
 
-        int argc = 0;
-        char *argv[PROC_ORIGIN_STACK];
-        char *p = rdbuf;
-        char *s;
-        int word = 0;
-        char ch;
-        do {
-            ch = *p;
-            if (*p != ' ' && *p != 0 && !word) {
-                s = p;
-                word = 1;
-            }
-            if ((*p == ' ' || *p == 0) && word) {
-                word = 0;
-                argv[argc++] = s;
-                *p = 0;
-            }
-            p++;
-        } while (ch);
-        argv[argc] = 0;
+        char *commands[MAX_ARGC];
+        int command_count = 0;
 
-        int fd = open(argv[0], O_RDWR);
-        if (fd == -1) {
-            if (rdbuf[0]) {
-                write(1, "{", 1);
-                write(1, rdbuf, r);
-                write(1, "}\n", 2);
+        // 分割命令
+        char *start = rdbuf;
+        for (int i = 0; i < r; i++) {
+            if (rdbuf[i] == '&') {
+                rdbuf[i] = '\0';
+                commands[command_count++] = start;
+                start = rdbuf + i + 1;
+                if (command_count >= MAX_ARGC) break;
             }
-        } else {
-            close(fd);
+        }
+        if (command_count < MAX_ARGC) {
+            commands[command_count++] = start;
+        }
+
+        for (int i = 0; i < command_count; i++) {
             int pid = fork();
-            if (pid != 0) {
-                /* parent */
-                int s;
-                wait(&s);
+            if (pid == 0) {
+                char *argv[MAX_ARGC];
+                int argc = 0;
+
+                start = commands[i];
+                for (int j = 0; start[j] != '\0'; j++) {
+                    if (start[j] == ' ') {
+                        start[j] = '\0';
+                        argv[argc++] = start;
+                        start = start + j + 1;
+                        j = -1; // reset j to start from the beginning of the new token
+                        if (argc >= MAX_ARGC) break;
+                    }
+                }
+                if (argc < MAX_ARGC) {
+                    argv[argc++] = start;
+                }
+                argv[argc] = NULL;
+
+                if (is_elf_file(argv[0])) {
+                    execv(argv[0], argv);
+                    printf("shabby_shell: command not found: %s\n", argv[0]);
+                } else {
+                    printf("shabby_shell: %s is not an ELF file\n", argv[0]);
+                }
+                exit(1);
             } else {
-                /* child */
-                execv(argv[0], argv);
+               wait(0); // 父进程等待子进程结束
             }
         }
     }
-
-    close(1);
-    close(0);
 }
 
 /*****************************************************************************

@@ -185,7 +185,7 @@ enum msgtype {
     /* TTY, SYS, FS, MM, etc */
     SYSCALL_RET,
 
-    KILL,
+    KILL,TRUNCATE,
 
     // GET_PNAME,
     FS_LOG,					// FS_LOG for fs send msg to mm
@@ -309,4 +309,9 @@ enum logtype{
 
 // #define MAX_SYS_COMMAND 32
 #define SYS_CHECKSUM_LEN 16
+
+#define NULL (void *)0
+#define MAX_COMMAND_LENGTH 128
+#define MAX_ARGC 10
+
 #endif /* _ORANGES_CONST_H_ */

@@ -12,7 +12,8 @@ int main(int argc, char *argv[]) {
         else{
             char buf[1024];
             int n;
-            while((n=read(fd,buf,1024))){
+            while((n=read(fd,buf,1023))){
+                buf[n]='\0';
                 printf("%s",buf);
                 // write(1,buf,n);
             }

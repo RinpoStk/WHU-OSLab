@@ -142,6 +142,9 @@ PUBLIC void task_fs()
             case STAT:
                 fs_msg.RETVAL = do_stat();
                 break;
+            case TRUNCATE:
+    		    fs_msg.RETVAL = do_truncate();
+    		    break;
             case FS_CHECKSUM:
                 buff = (char*)va2la(src, fs_msg.BUF);
                 fs_msg.PATHNAME = (char*)va2la(src, fs_msg.PATHNAME);
@@ -732,3 +735,32 @@ PRIVATE int fs_exit()
 
 //     return 0;
 // }
+PUBLIC int do_truncate()
+{
+    int fd = fs_msg.FD;
+    int length = fs_msg.CNT;
+
+    if (length < 0) {
+        return -1;
+    }
+
+    struct file_desc *fd_struct = pcaller->filp[fd];
+    if (!fd_struct) {
+        return -1;
+    }
+    struct inode *pin = fd_struct->fd_inode;
+    if (!pin) {
+        return -1;
+    }
+
+    if (length > pin->i_size) {
+        return -1;
+    }
+
+    pin->i_size = length;
+    fd_struct->fd_pos = length;
+
+    sync_inode(pin);
+
+    return 0;
+}
