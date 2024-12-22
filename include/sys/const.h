@@ -171,7 +171,7 @@ enum msgtype {
     GET_TICKS, GET_PID, GET_RTC_TIME,
 
     /* FS */
-    OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, SEARCH,
+    OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, SEARCH, FS_CHECKSUM, FS_CHECK,
 
     /* FS & TTY */
     SUSPEND_PROC, RESUME_PROC, GET_PROC_INFO,
@@ -291,9 +291,6 @@ enum msgtype {
 #define	NR_DEFAULT_FILE_SECTS	512 /* 2048 * 512 = 1MB */
 
 
-
-#endif /* _ORANGES_CONST_H_ */
-
 /**
  * @enum logtype
  */
@@ -309,3 +306,7 @@ enum logtype{
 #define CHECK_LOG_BUF 220
 
 #define MAX_FILE_CRYPT_KEYLEN 64
+
+// #define MAX_SYS_COMMAND 32
+#define SYS_CHECKSUM_LEN 16
+#endif /* _ORANGES_CONST_H_ */

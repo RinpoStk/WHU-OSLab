@@ -112,6 +112,7 @@ extern char* custom_log_file;
 extern	char* custom_buf;
 extern	const int	CUSTOMBUF_SIZE;
 
+// file encrypto
 extern unsigned int sysfile_cnt;
 extern char file_crypt_key[MAX_FILE_CRYPT_KEYLEN];
 extern unsigned int  file_crypt_keylen;

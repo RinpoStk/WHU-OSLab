@@ -61,6 +61,8 @@ PUBLIC void task_fs()
         msg_name[FORK] = "FORK";
         msg_name[EXIT] = "EXIT";
         msg_name[STAT] = "STAT";
+        msg_name[FS_CHECKSUM] = "FS_CHECKSUM";
+        msg_name[FS_CHECK] = "FS_CHECK";
         // printl("aaaain fs'open filelog\n");
         switch (msgtype) {
             case UNLINK:
@@ -139,6 +141,15 @@ PUBLIC void task_fs()
                 break;
             case STAT:
                 fs_msg.RETVAL = do_stat();
+                break;
+            case FS_CHECKSUM:
+                buff = (char*)va2la(src, fs_msg.BUF);
+                fs_msg.PATHNAME = (char*)va2la(src, fs_msg.PATHNAME);
+                put_checksum();
+                break;
+            case FS_CHECK:
+                buff = (char*)va2la(src, fs_msg.BUF);
+                command_check();
                 break;
             default:
                 dump_msg("FS::unknown message:", &fs_msg);

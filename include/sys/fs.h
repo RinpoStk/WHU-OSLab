@@ -77,6 +77,7 @@ struct inode {
 	u32	i_size;		/**< File size */
 	u32	i_start_sect;	/**< The first sector of the data */
 	u32	i_nr_sects;	/**< How many sectors the file occupies */
+	u8 i_checksum[SYS_CHECKSUM_LEN];
 	u8	_unused[16];	/**< Stuff for alignment */
 
 	/* the following items are only present in memory */
