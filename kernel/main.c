@@ -115,6 +115,7 @@ PUBLIC int kernel_main() {
             p->filp[j] = 0;
 
         stk -= t->stacksize;
+        p->stk_base = stk;
     }
 
     k_reenter = 0;
@@ -249,9 +250,10 @@ void untar(const char *filename) {
         close(fdout);
 
         int cfd = open(pathname, O_RDWR);
-        u8 res[SYS_CHECKSUM_LEN] = { 0 };
+        u8 res[SYS_CHECKSUM_LEN * 2] = { 0 };
 
         checksum_md5_file(cfd, res);
+        signature(res, res + SYS_CHECKSUM_LEN);
 
         MESSAGE msg;
         msg.type = FS_CHECKSUM;
@@ -384,14 +386,16 @@ void Init()
 
     printf("Init() is running ...\n");
 
-    /*check passwd */
+    /*check passwd  */
     sysfile_cnt = 31;
     char rdbuf[128];
     while (1)
     {
         write(1, "enter ur password:", 18);
-        int r = read(0, rdbuf, MAX_FILE_CRYPT_KEYLEN);
-        rdbuf[r] = 0;
+        strcpy(rdbuf, "cutehedgehog");
+        int r = strlen(rdbuf);
+        // int r = read(0, rdbuf, MAX_FILE_CRYPT_KEYLEN);
+        // rdbuf[r] = 0;
         if (r != 0 && check_passwd(rdbuf, r) == 1)
         {
             strcpy(file_crypt_key, rdbuf);

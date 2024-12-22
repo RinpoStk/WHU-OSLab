@@ -42,7 +42,7 @@ DASMOUTPUT	= kernel.bin.asm
 
 # command compile
 CASMFLAGS 	= -I include/ -f elf
-CCFLAGS 	= -masm=intel -m32 -fno-pie -I include/ -c -fno-builtin -fno-stack-protector -Wall
+CCFLAGS 	= -m32 -fno-pie -I include/ -c -fno-builtin -fno-stack-protector -Wall
 CLDFLAGS 	= -Ttext $(ENTRYPOINT) -m elf_i386
 
 # command src

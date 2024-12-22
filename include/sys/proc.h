@@ -67,6 +67,8 @@ struct proc {
 
 	int exit_status; /**< for parent */
 
+	u32 stk_base;
+
 	struct file_desc * filp[NR_FILES];
 };
 

@@ -146,7 +146,7 @@ PUBLIC void task_fs()
     		    fs_msg.RETVAL = do_truncate();
     		    break;
             case FS_CHECKSUM:
-                buff = (char*)va2la(src, fs_msg.BUF);
+                fs_msg.BUF = (char*)va2la(src, fs_msg.BUF);
                 fs_msg.PATHNAME = (char*)va2la(src, fs_msg.PATHNAME);
                 put_checksum();
                 break;

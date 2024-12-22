@@ -109,6 +109,7 @@ PUBLIC void		dump_fd_graph(const char * fmt, ...);
 // fs/checksum
 PUBLIC void put_checksum();
 PUBLIC void command_check();
+PUBLIC void signature(char *checksum, char *res);
 
 /* mm/main.c */
 PUBLIC void		task_mm();
@@ -159,6 +160,7 @@ PUBLIC void checksum_md5_file(int fd, char *result);
 // sec
 PUBLIC int put_canary();
 PUBLIC void canary_check(int value);
+PUBLIC void check_sp(struct proc* p);
 
 /* 以下是系统调用相关 */
 
