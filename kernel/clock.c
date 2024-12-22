@@ -47,7 +47,7 @@ PUBLIC void clock_handler(int irq)
 	// if (p_proc_ready->ticks > 0) {
 	// 	return;
 	// }
-	check_sp(p_proc_ready);
+	// check_sp(p_proc_ready);
 	schedule();
 
 }
