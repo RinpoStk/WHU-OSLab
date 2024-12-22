@@ -115,6 +115,7 @@ PUBLIC int kernel_main() {
             p->filp[j] = 0;
 
         stk -= t->stacksize;
+        p->stk_base = stk;
     }
 
     k_reenter = 0;

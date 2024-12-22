@@ -59,7 +59,21 @@ int main(int argc, char *argv[]) {
             inject(argv[2]);
             return 0;
         }
+        if (!strcmp(argv[1], "stack")) {
+            unsigned int sp;
+            asm("movl %%esp, %0" : "=r"(sp));
+            printf("%d\n", sp);
+            unsigned int tmp = 0;
+            //
+            // asm("movl %0, %%esp" : "=r"(tmp));
+            for (unsigned int i = 0; i < 0x4000 * 2; i++ ) {
+                asm("push %0" : "=r"(tmp));
+            }
 
+            asm("movl %%esp, %0" : "=r"(sp));
+            printf("%d\n", sp);
+            return 0;
+        }
         if (!strcmp(argv[1], "help")) {
             return 0;
         }

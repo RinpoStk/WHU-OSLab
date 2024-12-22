@@ -159,6 +159,7 @@ PUBLIC void checksum_md5_file(int fd, char *result);
 // sec
 PUBLIC int put_canary();
 PUBLIC void canary_check(int value);
+PUBLIC void check_sp(struct proc* p);
 
 /* 以下是系统调用相关 */
 

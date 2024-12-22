@@ -382,3 +382,24 @@ PUBLIC void canary_check(int value){
         panic("stack smashing detected!!\n");
     }
 }
+
+PUBLIC void check_sp(struct proc* p) {
+
+    u32 eip = p->regs.eip;
+    u32 cs = p->regs.cs;
+    u32 cs_base = reassembly(
+            p->ldts[cs >> 3].base_high, 24,
+            p->ldts[cs >> 3].base_mid, 16,
+            p->ldts[cs >> 3].base_low
+    );
+    u32 ip_addr = *((int*)(cs_base + eip));
+    // ip shouldn't be on the stack
+    if (eip > (u32)task_stack && eip < (u32)task_stack + STACK_SIZE_TOTAL) {
+        panic("checkstack: proc %s ip_addr (%d) invalid.", p->name, ip_addr);
+    }
+
+    u32 esp = p->regs.esp;
+    if (esp - p->stk_base > STACK_SIZE_DEFAULT) {
+        panic("checkstack: proc %s esp (%d) invalid.", p->name, esp);
+    }
+}
