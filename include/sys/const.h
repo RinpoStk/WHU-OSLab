@@ -313,4 +313,5 @@ enum logtype{
 #define NULL (void *)0
 #define MAX_COMMAND_LENGTH 128
 #define MAX_ARGC 10
+
 #endif /* _ORANGES_CONST_H_ */
