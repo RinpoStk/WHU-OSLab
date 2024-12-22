@@ -16,7 +16,6 @@
 
 #include "hd.h"
 
-
 /*****************************************************************************
  *                                put_checksum
  *****************************************************************************/
@@ -34,6 +33,11 @@ PUBLIC void put_checksum() {
     for (int i = 0; i < SYS_CHECKSUM_LEN; i++) {
        pin->i_checksum[i] = buf[i];
     }
+
+    for (int i = SYS_CHECKSUM_LEN; i < SYS_CHECKSUM_LEN * 2; i++) {
+        pin->i_signature[i-SYS_CHECKSUM_LEN] = buf[i];
+    }
+
     sync_inode(pin);
 }
 
@@ -47,7 +51,27 @@ PUBLIC void command_check() {
     for (int i = 0; i < SYS_CHECKSUM_LEN; i++) {
         if (pcaller->filp[fd]->fd_inode->i_checksum[i] != buf[i]) {
             fs_msg.FLAGS = 0;
-            break;
+            return;
         }
     }
+    u8 sign[SYS_CHECKSUM_LEN] = { 0 };
+    signature(pcaller->filp[fd]->fd_inode->i_checksum, sign);
+    for (int i = 0; i < SYS_CHECKSUM_LEN; i++) {
+        if (pcaller->filp[fd]->fd_inode->i_signature[i] != sign[i]) {
+            fs_msg.FLAGS = 0;
+            return;
+        }
+    }
+}
+
+PUBLIC void signature(char *checksum, char *res) {
+    u8 buffer[SYS_CHECKSUM_LEN] = { 0 };
+    for (int i = 0; i < SYS_CHECKSUM_LEN; i++) {
+        if (file_crypt_key[i] != 0) {
+            buffer[i] = checksum[i] ^ file_crypt_key[i];
+        } else {
+            buffer[i] = checksum[i];
+        }
+    }
+    checksum_md5(buffer, SYS_CHECKSUM_LEN, res);
 }

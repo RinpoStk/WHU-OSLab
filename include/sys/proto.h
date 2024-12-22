@@ -109,6 +109,7 @@ PUBLIC void		dump_fd_graph(const char * fmt, ...);
 // fs/checksum
 PUBLIC void put_checksum();
 PUBLIC void command_check();
+PUBLIC void signature(char *checksum, char *res);
 
 /* mm/main.c */
 PUBLIC void		task_mm();
