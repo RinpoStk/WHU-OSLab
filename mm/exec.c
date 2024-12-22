@@ -20,7 +20,7 @@
 #include "keyboard.h"
 #include "proto.h"
 #include "elf.h"
-
+#include "md5.h"
 
 /*****************************************************************************
  *                                do_exec
@@ -56,6 +56,21 @@ PUBLIC int do_exec()
 	if (fd == -1)
 		return -1;
 	assert(s.st_size < MMBUF_SIZE);
+
+	// checksum
+	u8 res[SYS_CHECKSUM_LEN] = { 0 };
+	checksum_md5_file(fd, res);
+
+	MESSAGE msg;
+	msg.type = FS_CHECK;
+	msg.FD   = fd;
+	msg.BUF  = (void*)res;
+
+	send_recv(BOTH, TASK_FS, &msg);
+	if (!msg.FLAGS) {
+		return 126;		//拒绝执行
+	}
+	lseek(fd, 0, SEEK_SET);
 	read(fd, mmbuf, s.st_size);
 	close(fd);
 

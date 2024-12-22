@@ -36,6 +36,7 @@ PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
 PUBLIC char *	itoa(char * str, int num);
 PUBLIC int	random();
+PUBLIC int check_passwd(char* passwd, unsigned int passwdlen);
 
 /* kernel.asm */
 PUBLIC void restart();
@@ -105,6 +106,10 @@ PUBLIC int		do_disklog();
 PUBLIC int		disklog(char * logstr); /* for debug */
 PUBLIC void		dump_fd_graph(const char * fmt, ...);
 
+// fs/checksum
+PUBLIC void put_checksum();
+PUBLIC void command_check();
+
 /* mm/main.c */
 PUBLIC void		task_mm();
 PUBLIC int		alloc_mem(int pid, int memsize);
@@ -146,6 +151,14 @@ PUBLIC void task_log(void);
 void init_sys_file(void);
 PUBLIC int syslog_file(int log_buf_flag, const char*fmt, ...);
 PUBLIC int filelog(int log_buf_flag, char * file_name);
+
+// md5 checksum
+PUBLIC void checksum_md5(void *input, u32 length, char *result);
+PUBLIC void checksum_md5_file(int fd, char *result);
+
+// sec
+PUBLIC int put_canary();
+PUBLIC void canary_check(int value);
 
 /* 以下是系统调用相关 */
 

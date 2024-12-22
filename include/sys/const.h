@@ -46,8 +46,8 @@
 #define WAITING   0x08	/* set when proc waiting for the child to terminate */
 #define HANGING   0x10	/* set when proc exits without being waited by parent */
 #define FREE_SLOT 0x20	/* set when proc table entry is not used
-			 * (ok to allocated to a new process)
-			 */
+             * (ok to allocated to a new process)
+             */
 
 /* TTY */
 #define NR_CONSOLES	3	/* consoles */
@@ -62,19 +62,19 @@
 #define TIMER0         0x40 /* I/O port for timer channel 0 */
 #define TIMER_MODE     0x43 /* I/O port for timer mode control */
 #define RATE_GENERATOR 0x34 /* 00-11-010-0 :
-			     * Counter0 - LSB then MSB - rate generator - binary
-			     */
+                 * Counter0 - LSB then MSB - rate generator - binary
+                 */
 #define TIMER_FREQ     1193182L/* clock frequency for timer in PC and AT */
 #define HZ             100  /* clock freq (software settable on IBM-PC) */
 
 /* AT keyboard */
 /* 8042 ports */
 #define KB_DATA		0x60	/* I/O port for keyboard data
-					Read : Read Output Buffer
-					Write: Write Input Buffer(8042 Data&8048 Command) */
+                    Read : Read Output Buffer
+                    Write: Write Input Buffer(8042 Data&8048 Command) */
 #define KB_CMD		0x64	/* I/O port for keyboard command
-					Read : Read Status Register
-					Write: Write Input Buffer(8042 Command) */
+                    Read : Read Status Register
+                    Write: Write Input Buffer(8042 Command) */
 #define LED_CODE	0xED
 #define KB_ACK		0xFA
 
@@ -90,10 +90,10 @@
 
 /* CMOS */
 #define CLK_ELE		0x70	/* CMOS RAM address register port (write only)
-				 * Bit 7 = 1  NMI disable
-				 *	   0  NMI enable
-				 * Bits 6-0 = RAM address
-				 */
+                 * Bit 7 = 1  NMI disable
+                 *	   0  NMI enable
+                 * Bits 6-0 = RAM address
+                 */
 
 #define CLK_IO		0x71	/* CMOS RAM data register port (read/write) */
 
@@ -105,15 +105,15 @@
 #define  SECOND           0
 #define  CLK_STATUS    0x0B	/* Status register B: RTC configuration	*/
 #define  CLK_HEALTH    0x0E	/* Diagnostic status: (should be set by Power
-				 * On Self-Test [POST])
-				 * Bit  7 = RTC lost power
-				 *	6 = Checksum (for addr 0x10-0x2d) bad
-				 *	5 = Config. Info. bad at POST
-				 *	4 = Mem. size error at POST
-				 *	3 = I/O board failed initialization
-				 *	2 = CMOS time invalid
-				 *    1-0 =    reserved
-				 */
+                 * On Self-Test [POST])
+                 * Bit  7 = RTC lost power
+                 *	6 = Checksum (for addr 0x10-0x2d) bad
+                 *	5 = Config. Info. bad at POST
+                 *	4 = Mem. size error at POST
+                 *	3 = I/O board failed initialization
+                 *	2 = CMOS time invalid
+                 *    1-0 =    reserved
+                 */
 
 /* Hardware interrupts */
 #define	NR_IRQ		16	/* Number of IRQs */
@@ -161,42 +161,42 @@
  * @brief MESSAGE types
  */
 enum msgtype {
-	/* 
-	 * when hard interrupt occurs, a msg (with type==HARD_INT) will
-	 * be sent to some tasks
-	 */
-	HARD_INT = 1,
+    /*
+     * when hard interrupt occurs, a msg (with type==HARD_INT) will
+     * be sent to some tasks
+     */
+    HARD_INT = 1,
 
-	/* SYS task */
-	GET_TICKS, GET_PID, GET_RTC_TIME,
+    /* SYS task */
+    GET_TICKS, GET_PID, GET_RTC_TIME,
 
-	/* FS */
-	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, SEARCH,
+    /* FS */
+    OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, SEARCH, FS_CHECKSUM, FS_CHECK,
 
-	/* FS & TTY */
-	SUSPEND_PROC, RESUME_PROC, GET_PROC_INFO,
+    /* FS & TTY */
+    SUSPEND_PROC, RESUME_PROC, GET_PROC_INFO,
 
-	/* MM */
-	EXEC, WAIT,
+    /* MM */
+    EXEC, WAIT,
 
-	/* FS & MM */
-	FORK, EXIT,
+    /* FS & MM */
+    FORK, EXIT,
 
-	/* TTY, SYS, FS, MM, etc */
-	SYSCALL_RET,
+    /* TTY, SYS, FS, MM, etc */
+    SYSCALL_RET,
 
-	KILL,
+    KILL,
 
-	// GET_PNAME,
-	FS_LOG,					// FS_LOG for fs send msg to mm
-	PUT_CUSTOMLOG,
+    // GET_PNAME,
+    FS_LOG,					// FS_LOG for fs send msg to mm
+    PUT_CUSTOMLOG,
 
-	/* message type for drivers */
-	DEV_OPEN = 1001,
-	DEV_CLOSE,
-	DEV_READ,
-	DEV_WRITE,
-	DEV_IOCTL
+    /* message type for drivers */
+    DEV_OPEN = 1001,
+    DEV_CLOSE,
+    DEV_READ,
+    DEV_WRITE,
+    DEV_IOCTL
 };
 
 /* macros for messages */
@@ -291,20 +291,22 @@ enum msgtype {
 #define	NR_DEFAULT_FILE_SECTS	512 /* 2048 * 512 = 1MB */
 
 
-
-#endif /* _ORANGES_CONST_H_ */
-
 /**
  * @enum logtype
  */
 enum logtype{
-	MMLOG = 1,
-	FSLOG,
-	SYSLOG,
-	HDLOG,
-	CUSTOMLOG
+    MMLOG = 1,
+    FSLOG,
+    SYSLOG,
+    HDLOG,
+    CUSTOMLOG
 };
 
 #define MAX_LOG_BUF 256
 #define CHECK_LOG_BUF 220
 
+#define MAX_FILE_CRYPT_KEYLEN 64
+
+// #define MAX_SYS_COMMAND 32
+#define SYS_CHECKSUM_LEN 16
+#endif /* _ORANGES_CONST_H_ */

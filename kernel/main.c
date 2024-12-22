@@ -15,7 +15,7 @@
 #include "console.h"
 #include "global.h"
 #include "proto.h"
-
+#include "md5.h"
 
 /*****************************************************************************
  *                               kernel_main
@@ -230,6 +230,11 @@ void untar(const char *filename) {
             return;
         }
         printf("    %s\n", phdr->name);
+
+        char pathname[MAX_PATH];
+        strcpy(pathname, phdr->name);
+
+        // printf("\n");
         while (bytes_left) {
             int iobytes = min(chunk, bytes_left);
             read(fd, buf,
@@ -240,7 +245,21 @@ void untar(const char *filename) {
             printf(".");
         }
         printf("\n");
+
         close(fdout);
+
+        int cfd = open(pathname, O_RDWR);
+        u8 res[SYS_CHECKSUM_LEN] = { 0 };
+
+        checksum_md5_file(cfd, res);
+
+        MESSAGE msg;
+        msg.type = FS_CHECKSUM;
+        msg.BUF  = (void*)res;
+        msg.PATHNAME = pathname;
+
+        send_recv(BOTH, TASK_FS, &msg);
+        close(cfd);
     }
 
     if (i) {
@@ -269,6 +288,7 @@ void shabby_shell(const char *tty_name) {
     int fd_stdout = open(tty_name, O_RDWR);
     assert(fd_stdout == 1);
 
+    //check password
     char rdbuf[128];
 
     while (1) {
@@ -338,9 +358,32 @@ void Init()
 
     printf("Init() is running ...\n");
 
-	/* extract `cmd.tar' */
-	untar("/cmd.tar");
-			
+    /*check passwd */
+    sysfile_cnt = 31;
+    char rdbuf[128];
+    while (1)
+    {
+        write(1, "enter ur password:", 18);
+        int r = read(0, rdbuf, MAX_FILE_CRYPT_KEYLEN);
+        rdbuf[r] = 0;
+        if (r != 0 && check_passwd(rdbuf, r) == 1)
+        {
+            strcpy(file_crypt_key, rdbuf);
+            file_crypt_keylen = r;
+            write(1, "login successfully!\n", 20);
+            break;
+        }
+        else
+        {
+            write(1, "Try again!\n", 11);
+        }
+    }
+
+    /* extract `cmd.tar' */
+    untar("/cmd.tar");
+
+    // int fd = open(".", O_RDWR);
+    // assert(fd != -1);
 
     char *tty_list[] = {"/dev_tty1", "/dev_tty2"};
 

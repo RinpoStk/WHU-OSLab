@@ -58,7 +58,12 @@ void init_sys_file(void) {
 PUBLIC int syslog_file(int log_buf_flag, const char*fmt, ...)     // should be use to log, not for init
 {
 // —————此段保留，还是传入格式化字符串
-	int i;
+
+#ifdef ENABLE_CANARY
+    int canary = put_canary();
+#endif
+
+    int i;
 	char buf[STR_DEFAULT_LEN];
 	va_list arg = (va_list)((char*)(&fmt) + 4); /**
 						     * 4: size of `fmt' in
@@ -205,9 +210,12 @@ PUBLIC int syslog_file(int log_buf_flag, const char*fmt, ...)     // should be u
     //     printl("mm_logbuf: %s\n", tmp);
 
     // }
-        printl("sysbuf: %d\n", sys_log_bufpos);
-        printl("flag %d\n", sys_buffull_flag);
-	return 0;
+        // printl("sysbuf: %d\n", sys_log_bufpos);
+        // printl("flag %d\n", sys_buffull_flag);
+#ifdef ENABLE_CANARY
+    canary_check(canary);
+#endif
+    return 0;
 }
 
 // reme to alter the Makefile!!
