@@ -357,8 +357,13 @@ void shabby_shell(const char * tty_name)
                 argv[argc] = NULL;
 
                 if (is_elf_file(argv[0])) {
-                    execv(argv[0], argv);
-                    printf("shabby_shell: command not found: %s\n", argv[0]);
+
+                    if (execv(argv[0], argv) == 126) {
+                        printf("shabby_shell: refused exec: %s\n", argv[0]);
+                    } else {
+                        printf("shabby_shell: command not found: %s\n", argv[0]);
+                    }
+
                 } else {
                     printf("shabby_shell: %s is not an ELF file\n", argv[0]);
                 }
@@ -392,10 +397,8 @@ void Init()
     while (1)
     {
         write(1, "enter ur password:", 18);
-        strcpy(rdbuf, "cutehedgehog");
-        int r = strlen(rdbuf);
-        // int r = read(0, rdbuf, MAX_FILE_CRYPT_KEYLEN);
-        // rdbuf[r] = 0;
+        int r = read(0, rdbuf, MAX_FILE_CRYPT_KEYLEN);
+        rdbuf[r] = 0;
         if (r != 0 && check_passwd(rdbuf, r) == 1)
         {
             strcpy(file_crypt_key, rdbuf);

@@ -19,6 +19,7 @@
 #include "global.h"
 #include "keyboard.h"
 #include "proto.h"
+#include "syscall.h"
 
 /*****************************************************************************
  *                                send_recv
@@ -75,9 +76,6 @@ PUBLIC int send_recv(int function, int src_dest, MESSAGE* msg)
  *          n bytes of s1 is found, respectively, to be less than, to match,
  *          or  be greater than the first n bytes of s2.
  *****************************************************************************/
-
-#include "syscall.h"
-
 PUBLIC int memcmp(const void * s1, const void *s2, int n)
 {
 	if ((s1 == 0) || (s2 == 0)) { /* for robustness */
@@ -248,4 +246,47 @@ PUBLIC int atoi(const char *str) {
 		str++;
 	}
 	return sign * result;
+}
+
+PUBLIC char *strchr(const char *str, int c) {
+	// char *p = va2la(proc2pid(p_proc_ready), (void *)str);
+	while (*str) {
+		if (*str == (char)c) {
+			return (char *)str;
+		}
+		str++;
+	}
+	return NULL;
+}
+
+PUBLIC char *strtok(char *str, const char *delim) {
+	static char *last;
+	if (str == NULL) {
+		str = last;
+	}
+	if (str == NULL) {
+		return NULL;
+	}
+	while (*str && strchr(delim, *str)) {
+		str++;
+	}
+	if (*str == '\0') {
+		last = NULL;
+		return NULL;
+	}
+	char *token = str;
+	while (*str && !strchr(delim, *str)) {
+		str++;
+	}
+	if (*str) {
+		*str = '\0';
+		last = str + 1;
+	} else {
+		last = NULL;
+	}
+	return token;
+}
+
+PUBLIC void user_syscall(MESSAGE msg) {
+	send_recv(BOTH, TASK_FS, &msg);
 }

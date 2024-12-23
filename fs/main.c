@@ -63,6 +63,7 @@ PUBLIC void task_fs()
         msg_name[STAT] = "STAT";
         msg_name[FS_CHECKSUM] = "FS_CHECKSUM";
         msg_name[FS_CHECK] = "FS_CHECK";
+        msg_name[TRUNCATE] = "TRUNCATE";
         // printl("aaaain fs'open filelog\n");
         switch (msgtype) {
             case UNLINK:
@@ -88,8 +89,7 @@ PUBLIC void task_fs()
             case LSEEK:
             case STAT:
             default:
-                if (strcmp(fs_msg.PATHNAME, ""))
-                    // printl("fs_msg: %s\n", fs_msg.PATHNAME);
+                if ((char *)fs_msg.PATHNAME == '\x00' && strcmp(fs_msg.PATHNAME, ""))
                     syslog_file(FSLOG, "[PORC %s, PID %d, OPERATE %s %s];\n", pname, src, msg_name[msgtype], fs_msg.PATHNAME);
                 else
                     syslog_file(FSLOG, "[PORC %s, PID %d, %s];\n", pname, src, msg_name[msgtype]);
@@ -700,7 +700,7 @@ PRIVATE int fs_exit()
 //     pathname[name_len] = 0;
 
 //     char filename[MAX_PATH];
-//     struct inode *dir_inode;
+//     struct inode *dir_inode;set_position
 
 //     if (strip_path(filename, pathname, &dir_inode) != 0)
 //         return 0;

